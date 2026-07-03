@@ -137,5 +137,15 @@ const { title, description = 'Kanade的小窝' } = Astro.props;
         }
       });
     </script>
+    <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script is:inline>
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on('login', () => {
+          if (window.location.pathname !== '/admin/') {
+            window.location.href = '/admin/';
+          }
+        });
+      }
+    </script>
   </body>
 </html>
