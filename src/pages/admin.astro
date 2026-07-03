@@ -27,45 +27,24 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
   }
 
   .admin-workspace {
-    width: 100%;
-    min-height: calc(100vh - 128px);
-    margin: 0 auto;
-    padding: 0;
-    background: transparent;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
+    width: min(1280px, 100%);
+    min-height: calc(100vh - 160px);
+    margin: 0 auto 24px;
+    padding: 24px 24px 28px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
   }
 
   .admin-workspace .panel-header {
-    display: none;
+    margin-bottom: 16px;
   }
 
   .admin-workspace #nc-root {
-    min-height: calc(100vh - 96px);
-  }
-
-  .admin-workspace #nc-root > div,
-  .admin-workspace #nc-root main,
-  .admin-workspace #nc-root section {
-    max-width: none !important;
-  }
-
-  .admin-workspace #nc-root main {
-    width: 100% !important;
-  }
-
-  .admin-workspace #nc-root [class*="AppMainContainer"],
-  .admin-workspace #nc-root [class*="CollectionMain"],
-  .admin-workspace #nc-root [class*="EditorContainer"],
-  .admin-workspace #nc-root [class*="EditorControl"],
-  .admin-workspace #nc-root [class*="Editor"] {
-    max-width: none !important;
-  }
-
-  .admin-workspace #nc-root textarea,
-  .admin-workspace #nc-root [contenteditable="true"] {
-    min-height: 52vh !important;
+    min-height: calc(100vh - 260px);
+    display: flex;
+    flex-direction: column;
   }
 
   @media (max-width: 768px) {
@@ -74,8 +53,8 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
     }
 
     .admin-workspace {
-      min-height: calc(100vh - 100px);
-      padding: 12px;
+      min-height: calc(100vh - 110px);
+      padding: 16px;
       border-radius: 14px;
     }
   }
