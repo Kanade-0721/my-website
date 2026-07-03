@@ -27,10 +27,10 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
   }
 
   .admin-workspace {
-    width: min(1280px, 100%);
-    min-height: calc(100vh - 160px);
-    margin: 0 auto 24px;
-    padding: 24px 24px 28px;
+    width: min(1680px, 100%);
+    min-height: calc(100vh - 128px);
+    margin: 0 auto;
+    padding: 20px;
     background: rgba(255, 255, 255, 0.12);
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 20px;
@@ -38,13 +38,11 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
   }
 
   .admin-workspace .panel-header {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
 
   .admin-workspace #nc-root {
-    min-height: calc(100vh - 260px);
-    display: flex;
-    flex-direction: column;
+    min-height: calc(100vh - 230px);
   }
 
   @media (max-width: 768px) {
@@ -53,8 +51,8 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
     }
 
     .admin-workspace {
-      min-height: calc(100vh - 110px);
-      padding: 16px;
+      min-height: calc(100vh - 100px);
+      padding: 12px;
       border-radius: 14px;
     }
   }
