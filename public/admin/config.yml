@@ -1,0 +1,83 @@
+backend:
+  name: git-gateway
+  branch: main
+
+local_backend: true
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+publish_mode: editorial_workflow
+
+collections:
+  - name: "blog"
+    label: "博客"
+    folder: "src/content/blog"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "简介", name: "description", widget: "text" }
+      - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "发布", name: "published", widget: "boolean", default: true }
+      - { label: "标签", name: "tags", widget: "list", default: [] }
+      - { label: "封面图", name: "cover", widget: "image", required: false }
+      - label: "媒体"
+        name: "media"
+        widget: "object"
+        collapsed: true
+        fields:
+          - { label: "图片", name: "images", widget: "list", default: [] }
+          - { label: "视频", name: "videos", widget: "list", default: [] }
+          - { label: "音频", name: "audios", widget: "list", default: [] }
+      - { label: "正文", name: "body", widget: "markdown" }
+
+  - name: "study"
+    label: "学习笔记"
+    folder: "src/content/study"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "简介", name: "description", widget: "text" }
+      - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "发布", name: "published", widget: "boolean", default: true }
+      - { label: "标签", name: "tags", widget: "list", default: [] }
+      - { label: "封面图", name: "cover", widget: "image", required: false }
+      - label: "媒体"
+        name: "media"
+        widget: "object"
+        collapsed: true
+        fields:
+          - { label: "图片", name: "images", widget: "list", default: [] }
+          - { label: "视频", name: "videos", widget: "list", default: [] }
+          - { label: "音频", name: "audios", widget: "list", default: [] }
+      - { label: "正文", name: "body", widget: "markdown" }
+
+  - name: "projects"
+    label: "项目"
+    folder: "src/content/projects"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "简介", name: "description", widget: "text" }
+      - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "发布", name: "published", widget: "boolean", default: true }
+      - { label: "标签", name: "tags", widget: "list", default: [] }
+      - { label: "封面图", name: "cover", widget: "image", required: false }
+      - label: "媒体"
+        name: "media"
+        widget: "object"
+        collapsed: true
+        fields:
+          - { label: "图片", name: "images", widget: "list", default: [] }
+          - { label: "视频", name: "videos", widget: "list", default: [] }
+          - { label: "音频", name: "audios", widget: "list", default: [] }
+      - { label: "正文", name: "body", widget: "markdown" }

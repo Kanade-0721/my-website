@@ -1,0 +1,59 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { render } from 'astro:content';
+import { formatEntryDate, getPublishedEntries } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const notes = await getPublishedEntries('study');
+
+  return notes.map((note) => ({
+    params: { slug: note.id },
+    props: { note },
+  }));
+}
+
+const { note } = Astro.props;
+const { Content } = await render(note);
+const media = note.data.media;
+---
+
+<Layout title={note.data.title} description={note.data.description}>
+  <section class="glass-panel detail-panel">
+    <a class="back-link" href="/study/">← 返回笔记</a>
+    <header class="detail-header">
+      <p class="panel-eyebrow">Note Detail</p>
+      <h1>{note.data.title}</h1>
+      <p class="detail-meta">{formatEntryDate(note.data.date)} · {note.data.tags.join(' · ')}</p>
+    </header>
+    {note.data.cover && <img class="media-image" src={note.data.cover} alt={note.data.title} loading="lazy" />}
+    <div class="detail-content">
+      <Content />
+    </div>
+    {(media.images.length > 0 || media.videos.length > 0 || media.audios.length > 0) && (
+      <section class="media-section">
+        <h3>Attached media</h3>
+        {media.images.length > 0 && (
+          <div class="media-grid">
+            {media.images.map((src) => (
+              <img class="media-image" src={src} alt={note.data.title} loading="lazy" />
+            ))}
+          </div>
+        )}
+        {media.videos.length > 0 && (
+          <div class="media-list">
+            {media.videos.map((src) => (
+              <video class="media-card" controls src={src} />
+            ))}
+          </div>
+        )}
+        {media.audios.length > 0 && (
+          <div class="media-list">
+            {media.audios.map((src) => (
+              <audio class="media-card" controls src={src} />
+            ))}
+          </div>
+        )}
+      </section>
+    )}
+  </section>
+</Layout>

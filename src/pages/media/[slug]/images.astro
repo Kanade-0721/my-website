@@ -1,0 +1,62 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  return [
+    { params: { slug: 'from-zero-to-personal-website' } },
+    { params: { slug: 'personal-website' } },
+  ];
+}
+
+const { slug } = Astro.params;
+
+type ImageMedia = {
+  title: string;
+  images: string[];
+};
+
+const mediaMap: Record<string, ImageMedia> = {
+  'from-zero-to-personal-website': {
+    title: '从零开始搭建个人网站',
+    images: [
+      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1483058712412-4245e9b90334?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&w=1200&q=80',
+    ],
+  },
+  'personal-website': {
+    title: 'Personal Website',
+    images: [
+      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
+    ],
+  },
+};
+
+const media = mediaMap[slug as keyof typeof mediaMap] as ImageMedia | undefined;
+const images: string[] = media?.images ?? [];
+if (!media) throw new Error('Media not found');
+---
+
+<Layout title={`${media.title} - Images`} description={`Images for ${media.title}`}>
+  <section class="glass-panel">
+    <a class="back-link" href="javascript:history.back()">← 返回</a>
+    <header class="panel-header">
+      <p class="panel-eyebrow">Image Gallery</p>
+      <h2>{media.title}</h2>
+      <p class="panel-copy">所有图片以网格方式展示，保持极简阅读体验。</p>
+    </header>
+    <div class="media-grid">
+      {images.map((image: string) => (
+        <img class="media-image" src={image} alt={media.title} loading="lazy" />
+      ))}
+    </div>
+  </section>
+</Layout>

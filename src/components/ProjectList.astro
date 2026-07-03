@@ -1,0 +1,16 @@
+---
+const { projects = [] } = Astro.props;
+const typedProjects: Array<{ name: string; description: string; status: string }> = projects;
+---
+
+<div class="project-list">
+  {typedProjects.map((project) => (
+    <article class="project-item">
+      <div class="project-item__top">
+        <h4>{project.name}</h4>
+        <span class="project-badge">{project.status}</span>
+      </div>
+      <p>{project.description}</p>
+    </article>
+  ))}
+</div>

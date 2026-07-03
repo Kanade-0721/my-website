@@ -1,0 +1,50 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  return [
+    { params: { slug: 'from-zero-to-personal-website' } },
+    { params: { slug: 'personal-website' } },
+  ];
+}
+
+const { slug } = Astro.params;
+
+type AudioMedia = {
+  title: string;
+  audios: string[];
+};
+
+const mediaMap: Record<string, AudioMedia> = {
+  'from-zero-to-personal-website': {
+    title: '从零开始搭建个人网站',
+    audios: ['https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'],
+  },
+  'personal-website': {
+    title: 'Personal Website',
+    audios: ['https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'],
+  },
+};
+
+const media = mediaMap[slug as keyof typeof mediaMap] as AudioMedia | undefined;
+const audios: string[] = media?.audios ?? [];
+if (!media) throw new Error('Media not found');
+---
+
+<Layout title={`${media.title} - Audios`} description={`Audios for ${media.title}`}>
+  <section class="glass-panel">
+    <a class="back-link" href="javascript:history.back()">← 返回</a>
+    <header class="panel-header">
+      <p class="panel-eyebrow">Audio Gallery</p>
+      <h2>{media.title}</h2>
+      <p class="panel-copy">音频以轻量播放器展示，适合随时收听。</p>
+    </header>
+    <div class="media-list">
+      {audios.map((audio: string) => (
+        <div class="media-card">
+          <audio controls preload="metadata" src={audio}></audio>
+        </div>
+      ))}
+    </div>
+  </section>
+</Layout>

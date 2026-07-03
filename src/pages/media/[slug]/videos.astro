@@ -1,0 +1,50 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  return [
+    { params: { slug: 'from-zero-to-personal-website' } },
+    { params: { slug: 'personal-website' } },
+  ];
+}
+
+const { slug } = Astro.params;
+
+type VideoMedia = {
+  title: string;
+  videos: string[];
+};
+
+const mediaMap: Record<string, VideoMedia> = {
+  'from-zero-to-personal-website': {
+    title: '从零开始搭建个人网站',
+    videos: ['https://www.youtube.com/embed/dQw4w9WgXcQ'],
+  },
+  'personal-website': {
+    title: 'Personal Website',
+    videos: ['https://www.youtube.com/embed/ScMzIvxBSi4'],
+  },
+};
+
+const media = mediaMap[slug as keyof typeof mediaMap] as VideoMedia | undefined;
+const videos: string[] = media?.videos ?? [];
+if (!media) throw new Error('Media not found');
+---
+
+<Layout title={`${media.title} - Videos`} description={`Videos for ${media.title}`}>
+  <section class="glass-panel">
+    <a class="back-link" href="javascript:history.back()">← 返回</a>
+    <header class="panel-header">
+      <p class="panel-eyebrow">Video Gallery</p>
+      <h2>{media.title}</h2>
+      <p class="panel-copy">视频以嵌入式播放器展示，保持内容优先。</p>
+    </header>
+    <div class="media-list">
+      {videos.map((video: string) => (
+        <div class="media-card">
+          <iframe src={video} title={media.title} loading="lazy" allowfullscreen></iframe>
+        </div>
+      ))}
+    </div>
+  </section>
+</Layout>

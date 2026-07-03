@@ -1,10 +1,60 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AboutCard from '../components/AboutCard.astro';
+import ProfileSection from '../components/ProfileSection.astro';
+import ProjectList from '../components/ProjectList.astro';
+import SkillTags from '../components/SkillTags.astro';
 
 const title = 'Kanade的小窝-关于我';
 const description = '关于 Kanade 的简要介绍';
+
+const projects = [
+  {
+    name: 'Personal Website',
+    description: '以 Astro 与玻璃拟态为核心，打造一个可持续维护的个人主页。',
+    status: 'In Progress',
+  },
+  {
+    name: 'UI System Notes',
+    description: '整理组件、排版与动效规范，提升整体设计一致性。',
+    status: 'Beta',
+  },
+];
+
+const skills = ['Astro', 'React', 'TypeScript', 'CSS', 'Figma', 'Git'];
 ---
 
 <Layout title={title} description={description}>
-  <h2>关于我</h2>
+  <section class="about-shell">
+    <div class="about-glass">
+      <div class="about-grid">
+        <ProfileSection
+          name="Kanade"
+          title="Creative Developer"
+          location="Shanghai, China"
+          email="hello@kanade.design"
+          role="Open to thoughtful side projects"
+          avatar="K"
+        >
+          <Fragment slot="tagline">
+            I build calm, modern experiences that feel clear, tactile, and alive.
+          </Fragment>
+          <Fragment slot="links">
+            <a class="text-link" href="/blog/">Blog</a>
+            <a class="text-link" href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
+          </Fragment>
+        </ProfileSection>
+
+        <div class="about-side">
+          <AboutCard title="Current Projects" subtitle="正在推进的方向">
+            <ProjectList projects={projects} />
+          </AboutCard>
+
+          <AboutCard title="Learning" subtitle="持续扩展的技能栈">
+            <SkillTags items={skills} />
+          </AboutCard>
+        </div>
+      </div>
+    </div>
+  </section>
 </Layout>

@@ -1,0 +1,31 @@
+---
+const {
+  name = 'Kanade',
+  title = 'Web Engineer',
+  location = 'Shanghai, China',
+  email = 'hello@kanade.design',
+  role = 'Available for thoughtful side projects',
+  avatar = 'K',
+} = Astro.props;
+---
+
+<aside class="profile-section">
+  <div class="profile-avatar" aria-hidden="true">{avatar}</div>
+  <div class="profile-content">
+    <h2>{name}</h2>
+    <p class="profile-title">{title}</p>
+    <p class="profile-tagline">
+      <slot name="tagline" />
+    </p>
+
+    <ul class="profile-meta">
+      <li><span>Location</span><strong>{location}</strong></li>
+      <li><span>Contact</span><strong>{email}</strong></li>
+      <li><span>Status</span><strong>{role}</strong></li>
+    </ul>
+
+    <div class="profile-links">
+      <slot name="links" />
+    </div>
+  </div>
+</aside>

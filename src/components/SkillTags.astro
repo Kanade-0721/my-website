@@ -1,0 +1,10 @@
+---
+const { items = [] } = Astro.props;
+const typedItems: string[] = items;
+---
+
+<div class="skill-list">
+  {typedItems.map((item) => (
+    <span class="skill-pill">{item}</span>
+  ))}
+</div>

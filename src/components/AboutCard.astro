@@ -1,0 +1,15 @@
+---
+const { title, subtitle, class: className = '' } = Astro.props;
+---
+
+<section class={`about-card ${className}`.trim()}>
+  {(title || subtitle) && (
+    <div class="about-card__header">
+      {title && <h3 class="about-card__title">{title}</h3>}
+      {subtitle && <p class="about-card__subtitle">{subtitle}</p>}
+    </div>
+  )}
+  <div class="about-card__body">
+    <slot />
+  </div>
+</section>

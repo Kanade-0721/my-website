@@ -1,10 +1,37 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { formatEntryDate, getPublishedEntries } from '../lib/content';
 
 const title = 'Kanade的小窝-我的项目';
 const description = 'Kanade 的项目展示';
+
+const items = await getPublishedEntries('projects');
 ---
 
 <Layout title={title} description={description}>
-  <h2>我的项目</h2>
+  <section class="glass-panel">
+    <header class="panel-header">
+      <p class="panel-eyebrow">Projects</p>
+      <h2>我的项目</h2>
+      <p class="panel-copy">这些是我正在构思或持续迭代的小型作品与实践。</p>
+    </header>
+
+    <div class="panel-list" role="list">
+      {items.length === 0 && (
+        <div class="empty-state">
+          <p>目前没有项目展示，后续会在这里补充。</p>
+        </div>
+      )}
+
+      {items.map((item) => (
+        <a class="panel-item" href={`/projects/${item.id}`} role="listitem">
+          <div class="item-main">
+            <h3>{item.data.title}</h3>
+            <p>{item.data.description}</p>
+          </div>
+          <div class="item-meta">{formatEntryDate(item.data.date)}</div>
+        </a>
+      ))}
+    </div>
+  </section>
 </Layout>

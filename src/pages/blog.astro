@@ -1,10 +1,37 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { formatEntryDate, getPublishedEntries } from '../lib/content';
 
 const title = 'Kanade的小窝-博客';
 const description = 'Kanade 的博客文章列表';
+
+const items = await getPublishedEntries('blog');
 ---
 
 <Layout title={title} description={description}>
-  <h2>博客</h2>
+  <section class="glass-panel">
+    <header class="panel-header">
+      <p class="panel-eyebrow">Blog</p>
+      <h2>博客</h2>
+      <p class="panel-copy">我把思考、经验和学习心得以轻量方式收录在这里。</p>
+    </header>
+
+    <div class="panel-list" role="list">
+      {items.length === 0 && (
+        <div class="empty-state">
+          <p>还没有发布任何内容，先空着吧。</p>
+        </div>
+      )}
+
+      {items.map((item) => (
+        <a class="panel-item" href={`/blog/${item.id}`} role="listitem">
+          <div class="item-main">
+            <h3>{item.data.title}</h3>
+            <p>{item.data.description}</p>
+          </div>
+          <div class="item-meta">{formatEntryDate(item.data.date)}</div>
+        </a>
+      ))}
+    </div>
+  </section>
 </Layout>

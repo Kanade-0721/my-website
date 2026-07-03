@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const title = 'CMS 编辑器';
+const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
+---
+
+<Layout title={title} description={description}>
+  <section class="glass-panel admin-shell">
+    <header class="panel-header">
+      <p class="panel-eyebrow">内容管理</p>
+      <h2>Git-based CMS</h2>
+      <p class="panel-copy">内容会保存为仓库里的 Markdown 文件，并在重新部署后出现在站点中。</p>
+    </header>
+    <div id="nc-root"></div>
+  </section>
+</Layout>
+
+<script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script is:inline src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
