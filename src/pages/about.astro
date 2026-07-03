@@ -1,28 +1,10 @@
-<html lang="zh-CN">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="author" content="Kanade">
-        <title>Kanade的小窝-关于我</title>
-    </head>
-    <body>
-        <header>
-            <h1><a href="/">Kanade的小窝</a></h1>
-            <nav>
-                <ul>
-                    <li><a href="/about/">关于我</a></li>
-                    <li><a href="/projects/">我的项目</a></li>
-                    <li><a href="/study/">学习笔记</a></li>
-                    <li><a href="/blog/">博客</a></li>
-                    <li><a href="/contact/">联系我</a></li>
-                </ul>
-            </nav>
-        </header>
-    </body>
-    <main>
-        
-    </main>
-    <footer>
-        <p>&copy; 2026 Kanade.</p>
-        <p><a href="/changelog/">Recent Updates</a></p>
-    </footer>
-</html>
+---
+import Layout from '../layouts/Layout.astro';
+
+const title = 'Kanade的小窝-关于我';
+const description = '关于 Kanade 的简要介绍';
+---
+
+<Layout title={title} description={description}>
+  <h2>关于我</h2>
+</Layout>
