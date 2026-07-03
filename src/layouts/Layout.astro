@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-const { title, description = 'Kanade的小窝' } = Astro.props;
+const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.props;
 ---
 
 <html lang="zh-CN">
@@ -14,7 +14,7 @@ const { title, description = 'Kanade的小窝' } = Astro.props;
   </head>
 
   <body>
-    <header id="navbar" class="navbar">
+    {!hideChrome && <header id="navbar" class="navbar">
       <div class="navbar-shell">
         <a href="/" class="brand" aria-label="返回首页">
           <span class="brand-mark">K</span>
@@ -49,17 +49,17 @@ const { title, description = 'Kanade的小窝' } = Astro.props;
         </div>
       </div>
       <div id="progressBar" class="progress-bar" aria-hidden="true"></div>
-    </header>
+    </header>}
 
     <main>
       <slot />
     </main>
 
-    <footer>
+    {!hideChrome && <footer>
       <hr />
       <p>&copy; 2026 Kanade.</p>
       <p><a href="/changelog/">Recent Updates</a></p>
-    </footer>
+    </footer>}
 
     <script is:inline>
       const navbar = document.getElementById('navbar');
@@ -71,7 +71,9 @@ const { title, description = 'Kanade的小窝' } = Astro.props;
 
       const applyTheme = (theme) => {
         document.documentElement.setAttribute('data-theme', theme);
-        themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        if (themeToggle) {
+          themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
       };
 
       const getPreferredTheme = () => {
@@ -91,6 +93,7 @@ const { title, description = 'Kanade的小窝' } = Astro.props;
 
       const updateNavbarState = () => {
         const scrolled = window.scrollY > 16;
+        if (!navbar || !progressBar) return;
         navbar.classList.toggle('scrolled', scrolled);
 
         const scrollTop = window.scrollY;
@@ -138,14 +141,5 @@ const { title, description = 'Kanade的小窝' } = Astro.props;
       });
     </script>
     <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script is:inline>
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on('login', () => {
-          if (window.location.pathname !== '/admin/') {
-            window.location.href = '/admin/';
-          }
-        });
-      }
-    </script>
   </body>
 </html>

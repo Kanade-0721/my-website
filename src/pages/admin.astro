@@ -5,8 +5,9 @@ const title = 'CMS 编辑器';
 const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} hideChrome={true}>
   <section class="admin-workspace">
+    <a class="admin-home-link" href="/" aria-label="返回主站">返回主站</a>
     <header class="panel-header">
       <p class="panel-eyebrow">内容管理</p>
       <h2>Git-based CMS</h2>
@@ -23,12 +24,13 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
     max-width: none;
     width: 100%;
     margin-bottom: 24px;
-    padding: 88px 16px 0;
+    padding: 16px;
   }
 
   .admin-workspace {
+    position: relative;
     width: min(1680px, 100%);
-    min-height: calc(100vh - 128px);
+    min-height: calc(100vh - 150px);
     margin: 0 auto;
     padding: 20px;
     background: rgba(255, 255, 255, 0.12);
@@ -42,18 +44,49 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
   }
 
   .admin-workspace #nc-root {
-    min-height: calc(100vh - 230px);
+    min-height: calc(100vh - 252px);
+  }
+
+  .admin-home-link {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 9999;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(17, 24, 39, 0.88);
+    color: #fff;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.22);
+  }
+
+  .admin-home-link:hover {
+    background: rgba(17, 24, 39, 1);
   }
 
   @media (max-width: 768px) {
     main:has(.admin-workspace) {
-      padding: 84px 8px 0;
+      padding: 8px;
     }
 
     .admin-workspace {
-      min-height: calc(100vh - 100px);
+      min-height: calc(100vh - 132px);
       padding: 12px;
       border-radius: 14px;
+    }
+
+    .admin-home-link {
+      right: 10px;
+      bottom: 10px;
+      min-height: 34px;
+      padding: 7px 10px;
+      font-size: 0.8rem;
     }
   }
 </style>
