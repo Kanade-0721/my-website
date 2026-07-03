@@ -1,5 +1,5 @@
 ---
-
+import "../styles/global.css";
 const { title, description = 'Kanade的小窝' } = Astro.props;
 ---
 
@@ -8,20 +8,46 @@ const { title, description = 'Kanade的小窝' } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="author" content="Kanade" />
     <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>{title}</title>
   </head>
+
   <body>
-    <header>
-      <h1><a href="/">Kanade的小窝</a></h1>
-      <nav>
-        <ul>
-          <li><a href="/about/">关于我</a></li>
-          <li><a href="/projects/">我的项目</a></li>
-          <li><a href="/study/">学习笔记</a></li>
-          <li><a href="/blog/">博客</a></li>
-          <li><a href="/contact/">联系我</a></li>
-        </ul>
-      </nav>
+    <header id="navbar" class="navbar">
+      <div class="navbar-shell">
+        <a href="/" class="brand" aria-label="返回首页">
+          <span class="brand-mark">K</span>
+          <span class="brand-text">Kanade</span>
+        </a>
+
+        <button
+          id="menuToggle"
+          class="menu-toggle"
+          type="button"
+          aria-label="切换导航菜单"
+          aria-expanded="false"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav id="siteNav" class="site-nav" aria-label="主导航">
+          <ul>
+            <li><a href="/study/" data-nav="study">Notes</a></li>
+            <li><a href="/blog/" data-nav="blog">Blog</a></li>
+            <li><a href="/projects/" data-nav="projects">Projects</a></li>
+            <li><a href="/about/" data-nav="about">About</a></li>
+          </ul>
+        </nav>
+
+        <div class="navbar-actions">
+          <button id="themeToggle" class="icon-btn" type="button" aria-label="切换主题">🌙</button>
+          <span class="avatar" aria-hidden="true">K</span>
+        </div>
+      </div>
+      <div id="progressBar" class="progress-bar" aria-hidden="true"></div>
     </header>
 
     <main>
@@ -29,8 +55,86 @@ const { title, description = 'Kanade的小窝' } = Astro.props;
     </main>
 
     <footer>
+      <hr />
       <p>&copy; 2026 Kanade.</p>
       <p><a href="/changelog/">Recent Updates</a></p>
     </footer>
+
+    <script is:inline>
+      const navbar = document.getElementById('navbar');
+      const siteNav = document.getElementById('siteNav');
+      const menuToggle = document.getElementById('menuToggle');
+      const themeToggle = document.getElementById('themeToggle');
+      const progressBar = document.getElementById('progressBar');
+      const navLinks = Array.from(document.querySelectorAll('.site-nav a[data-nav]'));
+
+      const applyTheme = (theme) => {
+        document.documentElement.setAttribute('data-theme', theme);
+        themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+      };
+
+      const getPreferredTheme = () => {
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme) return storedTheme;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      };
+
+      const setActiveLink = () => {
+        const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+
+        navLinks.forEach((link) => {
+          const targetPath = new URL(link.href, window.location.origin).pathname.replace(/\/+$/, '') || '/';
+          link.classList.toggle('active', currentPath === targetPath);
+        });
+      };
+
+      const updateNavbarState = () => {
+        const scrolled = window.scrollY > 16;
+        navbar.classList.toggle('scrolled', scrolled);
+
+        const scrollTop = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
+        progressBar.style.width = `${Math.min(progress, 100)}%`;
+      };
+
+      const closeMobileMenu = () => {
+        if (window.innerWidth <= 768) {
+          siteNav.classList.remove('open');
+          menuToggle?.setAttribute('aria-expanded', 'false');
+        }
+      };
+
+      const toggleMobileMenu = () => {
+        const isOpen = siteNav.classList.toggle('open');
+        menuToggle?.setAttribute('aria-expanded', String(isOpen));
+      };
+
+      applyTheme(getPreferredTheme());
+      setActiveLink();
+      updateNavbarState();
+      requestAnimationFrame(() => navbar.classList.add('ready'));
+
+      window.addEventListener('scroll', updateNavbarState, { passive: true });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+          closeMobileMenu();
+        }
+      });
+
+      themeToggle?.addEventListener('click', () => {
+        const nextTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        localStorage.setItem('theme', nextTheme);
+      });
+
+      menuToggle?.addEventListener('click', toggleMobileMenu);
+
+      document.addEventListener('click', (event) => {
+        if (window.innerWidth <= 768 && siteNav.classList.contains('open') && !navbar.contains(event.target)) {
+          closeMobileMenu();
+        }
+      });
+    </script>
   </body>
 </html>
