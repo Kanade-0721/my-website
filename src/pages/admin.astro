@@ -6,7 +6,7 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
 ---
 
 <Layout title={title} description={description}>
-  <section class="glass-panel admin-shell">
+  <section class="admin-workspace">
     <header class="panel-header">
       <p class="panel-eyebrow">内容管理</p>
       <h2>Git-based CMS</h2>
@@ -17,3 +17,43 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
 </Layout>
 
 <script is:inline src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+
+<style is:global>
+  main:has(.admin-workspace) {
+    max-width: none;
+    width: 100%;
+    margin-bottom: 24px;
+    padding: 88px 16px 0;
+  }
+
+  .admin-workspace {
+    width: min(1680px, 100%);
+    min-height: calc(100vh - 128px);
+    margin: 0 auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+  }
+
+  .admin-workspace .panel-header {
+    margin-bottom: 12px;
+  }
+
+  .admin-workspace #nc-root {
+    min-height: calc(100vh - 230px);
+  }
+
+  @media (max-width: 768px) {
+    main:has(.admin-workspace) {
+      padding: 84px 8px 0;
+    }
+
+    .admin-workspace {
+      min-height: calc(100vh - 100px);
+      padding: 12px;
+      border-radius: 14px;
+    }
+  }
+</style>
