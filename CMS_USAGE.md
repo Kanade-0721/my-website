@@ -81,19 +81,3 @@ GITHUB_OAUTH_CLIENT_SECRET
 3. Cloudflare Pages 检测到 `main` 分支更新后重新构建网站。
 4. 新内容出现在博客、笔记或项目页面中。
 
-## 一键发布 READY 草稿
-
-CMS 页面左下角有“发布所有 READY”按钮。它会调用 Cloudflare Pages Function：
-
-```text
-/api/publish-ready
-```
-
-这个函数会：
-
-1. 使用当前 CMS 登录得到的 GitHub token。
-2. 验证登录用户必须是 `Kanade-0721`。
-3. 查找 GitHub 上 READY / pending_publish 状态的 Pull Request。
-4. 合并这些 PR 到 `main`。
-
-没有 READY 内容时不会发布；仍是草稿或审核中的内容不会被发布。
