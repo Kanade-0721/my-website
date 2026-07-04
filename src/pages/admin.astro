@@ -22,6 +22,34 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
 <script is:inline>
   const publishReadyButton = document.getElementById('publishReadyButton');
 
+  const replayOAuthCallback = () => {
+    const message = localStorage.getItem('decap-oauth-message');
+    const objectMessage = localStorage.getItem('decap-oauth-object-message');
+    if (!message && !objectMessage) return;
+
+    let attempts = 0;
+    const interval = window.setInterval(() => {
+      if (message) {
+        window.postMessage(message, window.location.origin);
+      }
+
+      if (objectMessage) {
+        try {
+          window.postMessage(JSON.parse(objectMessage), window.location.origin);
+        } catch {
+          localStorage.removeItem('decap-oauth-object-message');
+        }
+      }
+
+      attempts += 1;
+      if (attempts >= 20) {
+        window.clearInterval(interval);
+        localStorage.removeItem('decap-oauth-message');
+        localStorage.removeItem('decap-oauth-object-message');
+      }
+    }, 500);
+  };
+
   const findGitHubToken = () => {
     for (let index = 0; index < localStorage.length; index += 1) {
       const key = localStorage.key(index);
@@ -85,6 +113,8 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
       publishReadyButton.textContent = '发布所有 READY';
     }
   });
+
+  replayOAuthCallback();
 </script>
 
 <style is:global>

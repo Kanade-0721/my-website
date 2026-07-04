@@ -103,13 +103,14 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
       };
 
       const closeMobileMenu = () => {
-        if (window.innerWidth <= 768) {
+        if (window.innerWidth <= 768 && siteNav) {
           siteNav.classList.remove('open');
           menuToggle?.setAttribute('aria-expanded', 'false');
         }
       };
 
       const toggleMobileMenu = () => {
+        if (!siteNav) return;
         const isOpen = siteNav.classList.toggle('open');
         menuToggle?.setAttribute('aria-expanded', String(isOpen));
       };
@@ -117,7 +118,9 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
       applyTheme(getPreferredTheme());
       setActiveLink();
       updateNavbarState();
-      requestAnimationFrame(() => navbar.classList.add('ready'));
+      if (navbar) {
+        requestAnimationFrame(() => navbar.classList.add('ready'));
+      }
 
       window.addEventListener('scroll', updateNavbarState, { passive: true });
       window.addEventListener('resize', () => {
@@ -135,7 +138,12 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
       menuToggle?.addEventListener('click', toggleMobileMenu);
 
       document.addEventListener('click', (event) => {
-        if (window.innerWidth <= 768 && siteNav.classList.contains('open') && !navbar.contains(event.target)) {
+        if (
+          window.innerWidth <= 768 &&
+          siteNav?.classList.contains('open') &&
+          navbar &&
+          !navbar.contains(event.target)
+        ) {
           closeMobileMenu();
         }
       });

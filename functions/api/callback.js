@@ -58,7 +58,9 @@ function oauthPage(type, payload) {
           window.opener.postMessage(objectMessage, '*');
           window.close();
         } else {
-          document.body.textContent = 'Authentication complete. You can close this window.';
+          localStorage.setItem('decap-oauth-message', message);
+          localStorage.setItem('decap-oauth-object-message', JSON.stringify(objectMessage));
+          window.location.replace('/admin/#/');
         }
       })();
     </script>
