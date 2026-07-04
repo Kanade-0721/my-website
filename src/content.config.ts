@@ -33,6 +33,11 @@ const sectionSchema = z.object({
   cover: z.string().optional(),
 });
 
+const projectSectionSchema = sectionSchema.extend({
+  technologies: z.array(z.string()).default([]),
+  status: z.enum(['进行中', '暂停', '完成']).default('进行中'),
+});
+
 const sectionedContentSchema = contentSchema.extend({
   section: z.string(),
 });
@@ -54,7 +59,7 @@ const study = defineCollection({
 
 const projectSections = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/project-sections' }),
-  schema: sectionSchema,
+  schema: projectSectionSchema,
 });
 
 const projects = defineCollection({

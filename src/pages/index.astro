@@ -1,23 +1,375 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { formatEntryDate, getPublishedEntries, getSectionedEntryPath } from '../lib/content';
+import type { SectionedEntry } from '../lib/content';
 
 const title = 'Kanade的小窝';
 const description = 'Kanade 的个人网站首页';
+
+const blogPosts = (await getPublishedEntries('blog')).slice(0, 5);
+const studyNotes = (await getPublishedEntries('study')).slice(0, 5);
+const projectUpdates = (await getPublishedEntries('projects')).slice(0, 5);
+
+const portals = [
+  {
+    title: '最近的博客',
+    href: '/blog/',
+    empty: '还没有博客，之后发布的文章会出现在这里。',
+    entries: blogPosts.map((entry) => ({
+      title: entry.data.title,
+      description: entry.data.description,
+      date: formatEntryDate(entry.data.date),
+      href: `/blog/${entry.id}/`,
+    })),
+  },
+  {
+    title: '在学的内容',
+    href: '/study/',
+    empty: '还没有学习笔记，之后的具体帖子会出现在这里。',
+    entries: studyNotes.map((entry) => ({
+      title: entry.data.title,
+      description: entry.data.description,
+      date: formatEntryDate(entry.data.date),
+      href: `${getSectionedEntryPath('study', entry as SectionedEntry)}/`,
+    })),
+  },
+  {
+    title: '项目更新',
+    href: '/projects/',
+    empty: '还没有项目更新，之后的具体帖子会出现在这里。',
+    entries: projectUpdates.map((entry) => ({
+      title: entry.data.title,
+      description: entry.data.description,
+      date: formatEntryDate(entry.data.date),
+      href: `${getSectionedEntryPath('projects', entry as SectionedEntry)}/`,
+    })),
+  },
+];
 ---
 
 <Layout title={title} description={description}>
-  <section class="hero-section">
-    <p class="hero-eyebrow">Personal site / creative notes</p>
-    <h1>欢迎来到Kanade的小窝</h1>
-    <p class="hero-subheadline">
-      我会在这里分享我的学习笔记、项目和博客文章，记录我的成长与探索。
-    </p>
-    <p class="hero-support">
-      我会保持更新，欢迎随时回来查看新的内容！如果你有任何问题或建议，请随时联系我。
-    </p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href="/admin/">Open CMS</a>
-      <a class="btn btn-secondary" href="/blog/">View Blog</a>
-    </div>
-  </section>
+  <div class="home-pages">
+    <section class="home-page home-cover" aria-labelledby="home-title">
+      <div class="cover-copy">
+        <p class="hero-eyebrow">Personal site / creative notes</p>
+        <h1 id="home-title">欢迎来到 Kanade 的小窝</h1>
+        <p class="hero-subheadline">
+          这是 Kanade 的个人网站，用来记录学习、项目和长期思考。
+        </p>
+        <p class="hero-support">
+          向下滑动可以看到最近更新，我会坚持更新我的内容，欢迎您的持续关注。
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#recent-portal">查看最近更新</a>
+          <a class="btn btn-secondary" href="/admin/">Open CMS</a>
+        </div>
+      </div>
+
+      <a class="scroll-cue" href="#recent-portal" aria-label="滑动到最近更新">
+        <span>Scroll</span>
+        <i></i>
+      </a>
+    </section>
+
+    <section class="home-page home-portal" id="recent-portal" aria-labelledby="portal-title">
+      <div class="portal-card">
+        <header class="portal-header">
+          <p class="panel-eyebrow">Recent Updates</p>
+          <h2 id="portal-title">最近在更新什么</h2>
+          <p>
+            这里按时间汇总博客、学习笔记和项目更新。学习与项目直接展示具体帖子，点击标题就可以进入详情页。
+          </p>
+        </header>
+
+        <div class="portal-grid">
+          {portals.map((portal) => (
+            <section class="portal-column" aria-labelledby={`${portal.title}-title`}>
+              <div class="portal-column__head">
+                <h3 id={`${portal.title}-title`}>{portal.title}</h3>
+                <a href={portal.href}>全部</a>
+              </div>
+
+              <div class="portal-table">
+                {portal.entries.length === 0 && <p class="portal-empty">{portal.empty}</p>}
+
+                {portal.entries.map((entry) => (
+                  <a class="portal-row" href={entry.href}>
+                    <span class="portal-row__title">{entry.title}</span>
+                    <span class="portal-row__desc">{entry.description}</span>
+                    <time datetime={entry.date}>{entry.date}</time>
+                  </a>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+    </section>
+  </div>
 </Layout>
+
+<style>
+  :global(html) {
+    scroll-behavior: smooth;
+    scroll-snap-type: y proximity;
+  }
+
+  :global(main) {
+    max-width: none;
+    margin-bottom: 0;
+    padding-top: 0;
+  }
+
+  .home-pages {
+    width: 100%;
+  }
+
+  .home-page {
+    min-height: 100vh;
+    scroll-snap-align: start;
+  }
+
+  .home-cover {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: min(1120px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 128px 0 72px;
+  }
+
+  .cover-copy {
+    max-width: 760px;
+    animation: heroFadeUp 0.8s ease both;
+  }
+
+  .home-cover h1 {
+    max-width: 780px;
+    margin-bottom: 18px;
+    font-size: clamp(2.7rem, 6vw, 5.2rem);
+    line-height: 1.04;
+  }
+
+  .scroll-cue {
+    position: absolute;
+    left: 0;
+    bottom: 42px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .scroll-cue i {
+    width: 34px;
+    height: 54px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    position: relative;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .scroll-cue i::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--muted);
+    transform: translateX(-50%);
+    animation: scrollDot 1.5s ease-in-out infinite;
+  }
+
+  .home-portal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 116px 24px 72px;
+  }
+
+  .portal-card {
+    width: min(1120px, 100%);
+    padding: 30px;
+    background: var(--surface);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    box-shadow: 0 24px 60px var(--shadow);
+    animation: panelFadeIn 0.8s ease both;
+  }
+
+  .portal-header {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .portal-header h2 {
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    line-height: 1.15;
+  }
+
+  .portal-header p:not(.panel-eyebrow) {
+    max-width: 680px;
+    color: var(--muted);
+  }
+
+  .portal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .portal-column {
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 18px;
+  }
+
+  .portal-column__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .portal-column__head h3 {
+    font-size: 1rem;
+  }
+
+  .portal-column__head a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    white-space: nowrap;
+  }
+
+  .portal-column__head a:hover {
+    color: var(--text);
+  }
+
+  .portal-table {
+    display: grid;
+    gap: 8px;
+  }
+
+  .portal-row {
+    display: grid;
+    gap: 4px;
+    min-height: 78px;
+    padding: 10px 0;
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .portal-row:last-child {
+    border-bottom: 0;
+  }
+
+  .portal-row:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .portal-row__title {
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .portal-row__desc {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .portal-row time,
+  .portal-empty {
+    color: var(--muted);
+    font-size: 0.86rem;
+  }
+
+  .portal-empty {
+    padding: 12px 0;
+  }
+
+  @keyframes scrollDot {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: translate(-50%, 0);
+    }
+
+    50% {
+      opacity: 1;
+      transform: translate(-50%, 16px);
+    }
+  }
+
+  @media (max-width: 920px) {
+    .home-cover {
+      width: min(100% - 32px, 720px);
+    }
+
+    .portal-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .portal-column {
+      min-height: auto;
+    }
+  }
+
+  @media (max-width: 640px) {
+    :global(main) {
+      padding-top: 0;
+    }
+
+    .home-cover {
+      min-height: 100vh;
+      padding: 110px 0 84px;
+    }
+
+    .home-cover h1 {
+      font-size: clamp(2.45rem, 15vw, 3.6rem);
+    }
+
+    .home-portal {
+      padding: 96px 16px 48px;
+    }
+
+    .portal-card {
+      padding: 22px;
+      border-radius: 22px;
+    }
+
+    .portal-column {
+      padding: 16px;
+    }
+
+    .scroll-cue {
+      bottom: 30px;
+    }
+  }
+</style>
