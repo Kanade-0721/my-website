@@ -21,15 +21,16 @@ const { Content } = await render(note);
 const media = note.data.media;
 const sectionHref = section ? `/study/${section.id}` : '/study/';
 const sectionTitle = section?.data.title ?? '学习笔记';
+const tagText = note.data.tags.length > 0 ? ` · ${note.data.tags.join(' · ')}` : '';
 ---
 
 <Layout title={note.data.title} description={note.data.description}>
-  <section class="glass-panel detail-panel">
+  <article class="reading-panel detail-panel">
     <a class="back-link" href={sectionHref}>← 返回{sectionTitle}</a>
     <header class="detail-header">
       <p class="panel-eyebrow">Note Update</p>
       <h1>{note.data.title}</h1>
-      <p class="detail-meta">{formatEntryDate(note.data.date)} · {sectionTitle} · {note.data.tags.join(' · ')}</p>
+      <p class="detail-meta">{formatEntryDate(note.data.date)} · {sectionTitle}{tagText}</p>
     </header>
     {note.data.cover && <img class="media-image" src={note.data.cover} alt={note.data.title} loading="lazy" />}
     <div class="detail-content">
@@ -61,5 +62,5 @@ const sectionTitle = section?.data.title ?? '学习笔记';
         )}
       </section>
     )}
-  </section>
+  </article>
 </Layout>

@@ -12,6 +12,9 @@ technologies:
   - GitHub OAuth
   - Cloudflare Pages
   - CSS
+  - CSS Scroll Snap
+  - Scoped CSS
+  - Responsive Design
 status: "进行中"
 ---
 

@@ -15,15 +15,16 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const media = post.data.media;
+const tagText = post.data.tags.length > 0 ? ` · ${post.data.tags.join(' · ')}` : '';
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
-  <section class="glass-panel detail-panel">
+  <article class="reading-panel detail-panel">
     <a class="back-link" href="/blog/">← 返回博客</a>
     <header class="detail-header">
       <p class="panel-eyebrow">Blog Detail</p>
       <h1>{post.data.title}</h1>
-      <p class="detail-meta">{formatEntryDate(post.data.date)} · {post.data.tags.join(' · ')}</p>
+      <p class="detail-meta">{formatEntryDate(post.data.date)}{tagText}</p>
     </header>
     {post.data.cover && <img class="media-image" src={post.data.cover} alt={post.data.title} loading="lazy" />}
     <div class="detail-content">
@@ -55,5 +56,5 @@ const media = post.data.media;
         )}
       </section>
     )}
-  </section>
+  </article>
 </Layout>

@@ -21,15 +21,16 @@ const { Content } = await render(project);
 const media = project.data.media;
 const sectionHref = section ? `/projects/${section.id}` : '/projects/';
 const sectionTitle = section?.data.title ?? '项目';
+const tagText = project.data.tags.length > 0 ? ` · ${project.data.tags.join(' · ')}` : '';
 ---
 
 <Layout title={project.data.title} description={project.data.description}>
-  <section class="glass-panel detail-panel">
+  <article class="reading-panel detail-panel">
     <a class="back-link" href={sectionHref}>← 返回{sectionTitle}</a>
     <header class="detail-header">
       <p class="panel-eyebrow">Project Update</p>
       <h1>{project.data.title}</h1>
-      <p class="detail-meta">{formatEntryDate(project.data.date)} · {sectionTitle} · {project.data.tags.join(' · ')}</p>
+      <p class="detail-meta">{formatEntryDate(project.data.date)} · {sectionTitle}{tagText}</p>
     </header>
     {project.data.cover && <img class="media-image" src={project.data.cover} alt={project.data.title} loading="lazy" />}
     <div class="detail-content">
@@ -61,5 +62,5 @@ const sectionTitle = section?.data.title ?? '项目';
         )}
       </section>
     )}
-  </section>
+  </article>
 </Layout>
