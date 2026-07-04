@@ -7,6 +7,7 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
 
 <Layout title={title} description={description} hideChrome={true}>
   <section class="admin-workspace">
+    <button class="admin-publish-ready" id="publishReadyButton" type="button">发布所有 READY</button>
     <a class="admin-home-link" href="/" aria-label="返回主站">返回主站</a>
     <header class="panel-header">
       <p class="panel-eyebrow">内容管理</p>
@@ -18,6 +19,73 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
 </Layout>
 
 <script is:inline src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+<script is:inline>
+  const publishReadyButton = document.getElementById('publishReadyButton');
+
+  const findGitHubToken = () => {
+    for (let index = 0; index < localStorage.length; index += 1) {
+      const key = localStorage.key(index);
+      if (!key) continue;
+
+      try {
+        const value = localStorage.getItem(key);
+        if (!value) continue;
+
+        const parsed = JSON.parse(value);
+        const token = parsed?.token || parsed?.access_token || parsed?.auth?.token || parsed?.backend?.token;
+        if (typeof token === 'string' && token.length > 20) {
+          return token;
+        }
+      } catch {
+        const value = localStorage.getItem(key) || '';
+        if (/^(gho_|ghu_|ghp_|github_pat_)/.test(value)) {
+          return value;
+        }
+      }
+    }
+
+    return '';
+  };
+
+  publishReadyButton?.addEventListener('click', async () => {
+    const confirmed = window.confirm('确定发布所有 READY 状态的草稿吗？这会合并到 main 并触发 Cloudflare Pages 重新部署。');
+    if (!confirmed) return;
+
+    publishReadyButton.disabled = true;
+    publishReadyButton.textContent = '发布中...';
+
+    try {
+      const token = findGitHubToken();
+      if (!token) {
+        throw new Error('没有找到 GitHub 登录令牌。请先在 CMS 中登录 GitHub，然后刷新后台再试。');
+      }
+
+      const response = await fetch('/api/publish-ready', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || '发布失败');
+      }
+
+      const failed = result.results.filter((entry) => !entry.merged);
+      if (result.count === 0) {
+        window.alert('没有找到 READY 状态的草稿。');
+      } else if (failed.length > 0) {
+        window.alert(`已尝试发布 ${result.count} 篇，其中 ${failed.length} 篇失败。请到 GitHub 检查冲突或权限。`);
+      } else {
+        window.alert(`已发布 ${result.count} 篇 READY 草稿。Cloudflare Pages 会开始重新部署。`);
+      }
+    } catch (error) {
+      window.alert(error.message || '发布失败，请稍后重试。');
+    } finally {
+      publishReadyButton.disabled = false;
+      publishReadyButton.textContent = '发布所有 READY';
+    }
+  });
+</script>
 
 <style is:global>
   main:has(.admin-workspace) {
@@ -70,6 +138,36 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
     background: rgba(17, 24, 39, 1);
   }
 
+  .admin-publish-ready {
+    position: fixed;
+    left: 18px;
+    bottom: 18px;
+    z-index: 9999;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.92);
+    color: #fff;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.22);
+  }
+
+  .admin-publish-ready:hover {
+    background: rgba(29, 78, 216, 1);
+  }
+
+  .admin-publish-ready:disabled {
+    cursor: wait;
+    opacity: 0.72;
+  }
+
   @media (max-width: 768px) {
     main:has(.admin-workspace) {
       padding: 8px;
@@ -83,6 +181,14 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
 
     .admin-home-link {
       right: 10px;
+      bottom: 10px;
+      min-height: 34px;
+      padding: 7px 10px;
+      font-size: 0.8rem;
+    }
+
+    .admin-publish-ready {
+      left: 10px;
       bottom: 10px;
       min-height: 34px;
       padding: 7px 10px;

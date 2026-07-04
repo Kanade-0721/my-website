@@ -781,6 +781,11 @@ main {
   border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
+.detail-content img,
+.media-section img {
+  cursor: zoom-in;
+}
+
 .media-list {
   display: flex;
   flex-direction: column;

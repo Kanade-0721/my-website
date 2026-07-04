@@ -3,23 +3,26 @@
 ## 新增文章、笔记或项目
 
 1. 打开 `/admin/`。
-2. 选择“博客”“学习笔记”或“项目”。
-3. 点击新建。
-4. 填写标题、简介、日期、标签和正文。
-5. 需要图片、视频或音频时，上传到媒体字段或在正文里引用 `/uploads/...`。
-6. 保存并发布。
+2. 使用 GitHub 登录。
+3. 选择“博客”“学习笔记”或“项目”。
+4. 点击新建。
+5. 填写标题、简介、日期、标签和正文。
+6. 需要图片、视频或音频时，上传到媒体字段或在正文里引用 `/uploads/...`。
+7. 保存、推进到 READY，最后发布。
 
-发布后，CMS 会把内容保存为 Markdown 文件并提交到 Git。站点重新构建后，新内容会自动出现在对应页面。
+发布后，CMS 会把内容保存为 Markdown 文件并提交到 GitHub。Cloudflare Pages 重新构建后，新内容会自动出现在对应页面。
 
 当前线上发布链路是：
 
 ```text
 /admin/ 编辑
-=> Netlify Identity 登录
-=> Netlify Git Gateway 提交到 Kanade-0721/my-website 的 main 分支
-=> Netlify 自动重新构建
+=> GitHub OAuth 登录
+=> Decap CMS 提交到 Kanade-0721/my-website
+=> Cloudflare Pages 自动重新构建
 => 静态页面更新
 ```
+
+如果你把多篇内容都推进到 READY 状态，可以在 CMS 页面左下角点击“发布所有 READY”。这个按钮只会尝试发布 READY / pending_publish 状态的内容，不会发布仍是草稿或审核中的内容。
 
 ## 字段说明
 

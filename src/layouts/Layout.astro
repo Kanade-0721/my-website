@@ -139,7 +139,17 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
           closeMobileMenu();
         }
       });
+
+      document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLImageElement)) return;
+        if (!target.closest('.detail-content, .media-section')) return;
+
+        const imageUrl = target.currentSrc || target.src;
+        if (imageUrl) {
+          window.open(imageUrl, '_blank', 'noopener,noreferrer');
+        }
+      });
     </script>
-    <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   </body>
 </html>

@@ -1,6 +1,9 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: Kanade-0721/my-website
   branch: main
+  base_url: /api
+  auth_endpoint: auth
 
 local_backend: true
 
