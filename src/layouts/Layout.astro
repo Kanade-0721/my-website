@@ -155,16 +155,17 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
 
       document.addEventListener('click', (event) => {
         const target = event.target;
-        if (!(target instanceof HTMLImageElement)) return;
-        if (!target.closest('.detail-content, .media-section')) return;
+        const image = target instanceof Element ? target.closest('img') : null;
+        if (!(image instanceof HTMLImageElement)) return;
+        if (!image.closest('.detail-panel, .detail-content, .media-section, .media-grid')) return;
 
-        const imageUrl = target.currentSrc || target.src;
+        const imageUrl = image.currentSrc || image.src;
         const lightbox = document.getElementById('imageLightbox');
         const lightboxImage = document.getElementById('imageLightboxImage');
         if (!imageUrl || !(lightbox instanceof HTMLElement) || !(lightboxImage instanceof HTMLImageElement)) return;
 
         lightboxImage.src = imageUrl;
-        lightboxImage.alt = target.alt || '图片大图';
+        lightboxImage.alt = image.alt || '图片大图';
         lightbox.classList.add('open');
         lightbox.setAttribute('aria-hidden', 'false');
         document.body.classList.add('lightbox-open');

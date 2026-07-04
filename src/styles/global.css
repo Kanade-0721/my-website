@@ -782,7 +782,9 @@ main {
 }
 
 .detail-content img,
-.media-section img {
+.media-section img,
+.detail-panel > img,
+.media-grid img {
   cursor: zoom-in;
 }
 
