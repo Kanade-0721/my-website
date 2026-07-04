@@ -60,7 +60,10 @@ function oauthPage(type, payload) {
         } else {
           localStorage.setItem('decap-oauth-message', message);
           localStorage.setItem('decap-oauth-object-message', JSON.stringify(objectMessage));
-          window.location.replace('/admin/#/');
+          document.body.textContent = 'Authentication complete. Returning to the CMS...';
+          window.setTimeout(function() {
+            window.location.replace('/admin/#/');
+          }, 1200);
         }
       })();
     </script>

@@ -50,6 +50,12 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
     }, 500);
   };
 
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'decap-oauth-message' || event.key === 'decap-oauth-object-message') {
+      replayOAuthCallback();
+    }
+  });
+
   const findGitHubToken = () => {
     for (let index = 0; index < localStorage.length; index += 1) {
       const key = localStorage.key(index);
