@@ -1,16 +1,30 @@
 ---
 const { projects = [] } = Astro.props;
-const typedProjects: Array<{ name: string; description: string; status: string }> = projects;
+const typedProjects: Array<{ name: string; description: string; status: string; href?: string }> = projects;
 ---
 
 <div class="project-list">
+  {typedProjects.length === 0 && (
+    <p class="project-empty">项目内容发布后，会自动显示最近更新的三个项目。</p>
+  )}
+
   {typedProjects.map((project) => (
-    <article class="project-item">
-      <div class="project-item__top">
-        <h4>{project.name}</h4>
-        <span class="project-badge">{project.status}</span>
-      </div>
-      <p>{project.description}</p>
-    </article>
+    project.href ? (
+      <a class="project-item" href={project.href}>
+        <div class="project-item__top">
+          <h4>{project.name}</h4>
+          <span class="project-badge">{project.status}</span>
+        </div>
+        <p>{project.description}</p>
+      </a>
+    ) : (
+      <article class="project-item">
+        <div class="project-item__top">
+          <h4>{project.name}</h4>
+          <span class="project-badge">{project.status}</span>
+        </div>
+        <p>{project.description}</p>
+      </article>
+    )
   ))}
 </div>

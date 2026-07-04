@@ -4,22 +4,18 @@ import AboutCard from '../components/AboutCard.astro';
 import ProfileSection from '../components/ProfileSection.astro';
 import ProjectList from '../components/ProjectList.astro';
 import SkillTags from '../components/SkillTags.astro';
+import { formatEntryDate, getPublishedEntries } from '../lib/content';
 
-const title = 'Kanade的小窝-关于我';
+const title = 'Kanade 的小窗 | 关于我';
 const description = '关于 Kanade 的简要介绍';
 
-const projects = [
-  {
-    name: 'Personal Website',
-    description: '以 Astro 与玻璃拟态为核心，打造一个可持续维护的个人主页。',
-    status: 'In Progress',
-  },
-  {
-    name: 'UI System Notes',
-    description: '整理组件、排版与动效规范，提升整体设计一致性。',
-    status: 'Beta',
-  },
-];
+const latestProjects = (await getPublishedEntries('projects')).slice(0, 3);
+const projects = latestProjects.map((project) => ({
+  name: project.data.title,
+  description: project.data.description,
+  status: formatEntryDate(project.data.date),
+  href: `/projects/${project.id}`,
+}));
 
 const skills = ['Astro', 'React', 'TypeScript', 'CSS', 'Figma', 'Git'];
 ---
@@ -46,7 +42,7 @@ const skills = ['Astro', 'React', 'TypeScript', 'CSS', 'Figma', 'Git'];
         </ProfileSection>
 
         <div class="about-side">
-          <AboutCard title="Current Projects" subtitle="正在推进的方向">
+          <AboutCard title="Current Projects" subtitle="最近更新的项目">
             <ProjectList projects={projects} />
           </AboutCard>
 
