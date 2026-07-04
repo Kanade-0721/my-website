@@ -55,6 +55,11 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
       <slot />
     </main>
 
+    <div id="imageLightbox" class="image-lightbox" aria-hidden="true">
+      <button class="image-lightbox__close" type="button" aria-label="关闭大图">×</button>
+      <img id="imageLightboxImage" class="image-lightbox__image" alt="" />
+    </div>
+
     {!hideChrome && <footer>
       <hr />
       <p>&copy; 2026 Kanade.</p>
@@ -154,8 +159,38 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
         if (!target.closest('.detail-content, .media-section')) return;
 
         const imageUrl = target.currentSrc || target.src;
-        if (imageUrl) {
-          window.open(imageUrl, '_blank', 'noopener,noreferrer');
+        const lightbox = document.getElementById('imageLightbox');
+        const lightboxImage = document.getElementById('imageLightboxImage');
+        if (!imageUrl || !(lightbox instanceof HTMLElement) || !(lightboxImage instanceof HTMLImageElement)) return;
+
+        lightboxImage.src = imageUrl;
+        lightboxImage.alt = target.alt || '图片大图';
+        lightbox.classList.add('open');
+        lightbox.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('lightbox-open');
+      });
+
+      const closeLightbox = () => {
+        const lightbox = document.getElementById('imageLightbox');
+        const lightboxImage = document.getElementById('imageLightboxImage');
+        if (!(lightbox instanceof HTMLElement) || !(lightboxImage instanceof HTMLImageElement)) return;
+
+        lightbox.classList.remove('open');
+        lightbox.setAttribute('aria-hidden', 'true');
+        lightboxImage.removeAttribute('src');
+        document.body.classList.remove('lightbox-open');
+      };
+
+      document.getElementById('imageLightbox')?.addEventListener('click', (event) => {
+        const target = event.target;
+        if (target instanceof HTMLElement && (target.id === 'imageLightbox' || target.closest('.image-lightbox__close'))) {
+          closeLightbox();
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          closeLightbox();
         }
       });
     </script>
