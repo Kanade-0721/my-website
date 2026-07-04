@@ -1,6 +1,18 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+const mediaSchema = z
+  .object({
+    images: z.array(z.string()).default([]),
+    videos: z.array(z.string()).default([]),
+    audios: z.array(z.string()).default([]),
+  })
+  .default({
+    images: [],
+    videos: [],
+    audios: [],
+  });
+
 const contentSchema = z.object({
   title: z.string(),
   description: z.string(),
@@ -9,17 +21,20 @@ const contentSchema = z.object({
   published: z.boolean().default(true),
   tags: z.array(z.string()).default([]),
   cover: z.string().optional(),
-  media: z
-    .object({
-      images: z.array(z.string()).default([]),
-      videos: z.array(z.string()).default([]),
-      audios: z.array(z.string()).default([]),
-    })
-    .default({
-      images: [],
-      videos: [],
-      audios: [],
-    }),
+  media: mediaSchema,
+});
+
+const sectionSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  date: z.coerce.date(),
+  order: z.number().optional(),
+  published: z.boolean().default(true),
+  cover: z.string().optional(),
+});
+
+const sectionedContentSchema = contentSchema.extend({
+  section: z.string(),
 });
 
 const blog = defineCollection({
@@ -27,14 +42,24 @@ const blog = defineCollection({
   schema: contentSchema,
 });
 
+const studySections = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/study-sections' }),
+  schema: sectionSchema,
+});
+
 const study = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/study' }),
-  schema: contentSchema,
+  schema: sectionedContentSchema,
+});
+
+const projectSections = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/project-sections' }),
+  schema: sectionSchema,
 });
 
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/projects' }),
-  schema: contentSchema,
+  schema: sectionedContentSchema,
 });
 
-export const collections = { blog, study, projects };
+export const collections = { blog, studySections, study, projectSections, projects };

@@ -14,7 +14,7 @@ const projects = latestProjects.map((project) => ({
   name: project.data.title,
   description: project.data.description,
   status: formatEntryDate(project.data.date),
-  href: `/projects/${project.id}`,
+  href: `/projects/${project.data.section}/${project.id}`,
 }));
 
 const skills = ['Astro', 'React', 'TypeScript', 'CSS', 'Figma', 'Git'];
@@ -26,27 +26,29 @@ const skills = ['Astro', 'React', 'TypeScript', 'CSS', 'Figma', 'Git'];
       <div class="about-grid">
         <ProfileSection
           name="Kanade"
-          title="Creative Developer"
-          location="Shanghai, China"
-          email="hello@kanade.design"
-          role="Open to thoughtful side projects"
-          avatar="K"
+          title="北京大学工学院本科生"
+          location="北京海淀"
+          email="kanade0721@126.com"
+          role="游戏，动漫，coding"
+          statusLabel="爱好"
+          avatarSrc="/uploads/profile-avatar.jpg"
+          avatarAlt="Kanade 的头像"
         >
           <Fragment slot="tagline">
-            I build calm, modern experiences that feel clear, tactile, and alive.
+            今天总是和昨天不一样，所以很珍贵
           </Fragment>
           <Fragment slot="links">
-            <a class="text-link" href="/blog/">Blog</a>
+            <a class="text-link" href="/blog/">博客</a>
             <a class="text-link" href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
           </Fragment>
         </ProfileSection>
 
         <div class="about-side">
-          <AboutCard title="Current Projects" subtitle="最近更新的项目">
+          <AboutCard title="近期项目" subtitle="最近更新的三个项目">
             <ProjectList projects={projects} />
           </AboutCard>
 
-          <AboutCard title="Learning" subtitle="持续扩展的技能栈">
+          <AboutCard title="正在学习" subtitle="持续扩展的技能栈">
             <SkillTags items={skills} />
           </AboutCard>
         </div>

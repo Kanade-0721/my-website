@@ -1,29 +1,35 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from '../../../layouts/Layout.astro';
 import { render } from 'astro:content';
-import { formatEntryDate, getPublishedEntries } from '../../lib/content';
+import { formatEntryDate, getPublishedEntries, getPublishedSections } from '../../../lib/content';
 
 export async function getStaticPaths() {
   const projects = await getPublishedEntries('projects');
+  const sections = await getPublishedSections('projectSections');
 
   return projects.map((project) => ({
-    params: { slug: project.id },
-    props: { project },
+    params: { section: project.data.section, slug: project.id },
+    props: {
+      project,
+      section: sections.find((item) => item.id === project.data.section),
+    },
   }));
 }
 
-const { project } = Astro.props;
+const { project, section } = Astro.props;
 const { Content } = await render(project);
 const media = project.data.media;
+const sectionHref = section ? `/projects/${section.id}` : '/projects/';
+const sectionTitle = section?.data.title ?? '项目';
 ---
 
 <Layout title={project.data.title} description={project.data.description}>
   <section class="glass-panel detail-panel">
-    <a class="back-link" href="/projects/">← 返回项目</a>
+    <a class="back-link" href={sectionHref}>← 返回{sectionTitle}</a>
     <header class="detail-header">
-      <p class="panel-eyebrow">Project Detail</p>
+      <p class="panel-eyebrow">Project Update</p>
       <h1>{project.data.title}</h1>
-      <p class="detail-meta">{formatEntryDate(project.data.date)} · {project.data.tags.join(' · ')}</p>
+      <p class="detail-meta">{formatEntryDate(project.data.date)} · {sectionTitle} · {project.data.tags.join(' · ')}</p>
     </header>
     {project.data.cover && <img class="media-image" src={project.data.cover} alt={project.data.title} loading="lazy" />}
     <div class="detail-content">
@@ -31,7 +37,7 @@ const media = project.data.media;
     </div>
     {(media.images.length > 0 || media.videos.length > 0 || media.audios.length > 0) && (
       <section class="media-section">
-        <h3>Attached media</h3>
+        <h3>附加媒体</h3>
         {media.images.length > 0 && (
           <div class="media-grid">
             {media.images.map((src) => (

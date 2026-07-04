@@ -325,6 +325,9 @@ main {
 }
 
 .item-meta {
+  display: grid;
+  gap: 4px;
+  justify-items: end;
   flex-shrink: 0;
   font-size: 0.9rem;
   color: var(--muted);
@@ -462,7 +465,15 @@ main {
   color: white;
   font-size: 2rem;
   font-weight: 700;
+  overflow: hidden;
   box-shadow: 0 16px 30px rgba(96, 165, 250, 0.24);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .profile-content h2 {

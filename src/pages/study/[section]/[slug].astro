@@ -1,29 +1,35 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from '../../../layouts/Layout.astro';
 import { render } from 'astro:content';
-import { formatEntryDate, getPublishedEntries } from '../../lib/content';
+import { formatEntryDate, getPublishedEntries, getPublishedSections } from '../../../lib/content';
 
 export async function getStaticPaths() {
   const notes = await getPublishedEntries('study');
+  const sections = await getPublishedSections('studySections');
 
   return notes.map((note) => ({
-    params: { slug: note.id },
-    props: { note },
+    params: { section: note.data.section, slug: note.id },
+    props: {
+      note,
+      section: sections.find((item) => item.id === note.data.section),
+    },
   }));
 }
 
-const { note } = Astro.props;
+const { note, section } = Astro.props;
 const { Content } = await render(note);
 const media = note.data.media;
+const sectionHref = section ? `/study/${section.id}` : '/study/';
+const sectionTitle = section?.data.title ?? '学习笔记';
 ---
 
 <Layout title={note.data.title} description={note.data.description}>
   <section class="glass-panel detail-panel">
-    <a class="back-link" href="/study/">← 返回笔记</a>
+    <a class="back-link" href={sectionHref}>← 返回{sectionTitle}</a>
     <header class="detail-header">
-      <p class="panel-eyebrow">Note Detail</p>
+      <p class="panel-eyebrow">Note Update</p>
       <h1>{note.data.title}</h1>
-      <p class="detail-meta">{formatEntryDate(note.data.date)} · {note.data.tags.join(' · ')}</p>
+      <p class="detail-meta">{formatEntryDate(note.data.date)} · {sectionTitle} · {note.data.tags.join(' · ')}</p>
     </header>
     {note.data.cover && <img class="media-image" src={note.data.cover} alt={note.data.title} loading="lazy" />}
     <div class="detail-content">
@@ -31,7 +37,7 @@ const media = note.data.media;
     </div>
     {(media.images.length > 0 || media.videos.length > 0 || media.audios.length > 0) && (
       <section class="media-section">
-        <h3>Attached media</h3>
+        <h3>附加媒体</h3>
         {media.images.length > 0 && (
           <div class="media-grid">
             {media.images.map((src) => (

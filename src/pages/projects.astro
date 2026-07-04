@@ -1,35 +1,44 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { formatEntryDate, getPublishedEntries } from '../lib/content';
+import { formatEntryDate, getEntriesInSection, getPublishedSections } from '../lib/content';
 
-const title = 'Kanade的小窝-我的项目';
-const description = 'Kanade 的项目展示';
+const title = 'Kanade 的小窗 | 项目';
+const description = 'Kanade 的项目分区';
 
-const items = await getPublishedEntries('projects');
+const sections = await getPublishedSections('projectSections');
+const sectionsWithCounts = await Promise.all(
+  sections.map(async (section) => ({
+    section,
+    count: (await getEntriesInSection('projects', section.id)).length,
+  })),
+);
 ---
 
 <Layout title={title} description={description}>
   <section class="glass-panel">
     <header class="panel-header">
       <p class="panel-eyebrow">Projects</p>
-      <h2>我的项目</h2>
-      <p class="panel-copy">这些是我正在构思或持续迭代的小型作品与实践。</p>
+      <h2>项目</h2>
+      <p class="panel-copy">每个项目是一个分区，项目里的阶段记录和更新会集中放在对应分区下。</p>
     </header>
 
     <div class="panel-list" role="list">
-      {items.length === 0 && (
+      {sectionsWithCounts.length === 0 && (
         <div class="empty-state">
-          <p>目前没有项目展示，后续会在这里补充。</p>
+          <p>还没有项目分区，可以先在 CMS 里创建一个项目。</p>
         </div>
       )}
 
-      {items.map((item) => (
-        <a class="panel-item" href={`/projects/${item.id}`} role="listitem">
+      {sectionsWithCounts.map(({ section, count }) => (
+        <a class="panel-item" href={`/projects/${section.id}`} role="listitem">
           <div class="item-main">
-            <h3>{item.data.title}</h3>
-            <p>{item.data.description}</p>
+            <h3>{section.data.title}</h3>
+            <p>{section.data.description}</p>
           </div>
-          <div class="item-meta">{formatEntryDate(item.data.date)}</div>
+          <div class="item-meta">
+            <span>{count} 篇更新</span>
+            <span>{formatEntryDate(section.data.date)}</span>
+          </div>
         </a>
       ))}
     </div>

@@ -1,16 +1,21 @@
 ---
 const {
   name = 'Kanade',
-  title = 'Web Engineer',
-  location = 'Shanghai, China',
-  email = 'hello@kanade.design',
-  role = 'Available for thoughtful side projects',
+  title = '北京大学工学院本科生',
+  location = '北京海淀',
+  email = 'kanade0721@126.com',
+  role = '游戏，动漫，coding',
   avatar = 'K',
+  avatarSrc,
+  avatarAlt = '',
+  statusLabel = '爱好',
 } = Astro.props;
 ---
 
 <aside class="profile-section">
-  <div class="profile-avatar" aria-hidden="true">{avatar}</div>
+  <div class="profile-avatar" aria-hidden={avatarSrc ? undefined : 'true'}>
+    {avatarSrc ? <img src={avatarSrc} alt={avatarAlt || name} loading="lazy" /> : avatar}
+  </div>
   <div class="profile-content">
     <h2>{name}</h2>
     <p class="profile-title">{title}</p>
@@ -19,9 +24,9 @@ const {
     </p>
 
     <ul class="profile-meta">
-      <li><span>Location</span><strong>{location}</strong></li>
-      <li><span>Contact</span><strong>{email}</strong></li>
-      <li><span>Status</span><strong>{role}</strong></li>
+      <li><span>所在地</span><strong>{location}</strong></li>
+      <li><span>联系邮箱</span><strong>{email}</strong></li>
+      <li><span>{statusLabel}</span><strong>{role}</strong></li>
     </ul>
 
     <div class="profile-links">

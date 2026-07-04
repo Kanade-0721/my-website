@@ -1,11 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { formatEntryDate, getPublishedEntries } from '../lib/content';
+import { formatEntryDate, getEntriesInSection, getPublishedSections } from '../lib/content';
 
-const title = 'Kanade的小窝-学习笔记';
-const description = 'Kanade 的学习笔记';
+const title = 'Kanade 的小窗 | 学习笔记';
+const description = 'Kanade 的学习笔记分区';
 
-const items = await getPublishedEntries('study');
+const sections = await getPublishedSections('studySections');
+const sectionsWithCounts = await Promise.all(
+  sections.map(async (section) => ({
+    section,
+    count: (await getEntriesInSection('study', section.id)).length,
+  })),
+);
 ---
 
 <Layout title={title} description={description}>
@@ -13,23 +19,26 @@ const items = await getPublishedEntries('study');
     <header class="panel-header">
       <p class="panel-eyebrow">Notes</p>
       <h2>学习笔记</h2>
-      <p class="panel-copy">零散的思考、技巧与记录，统一放在这里。</p>
+      <p class="panel-copy">先选择一个笔记分区，再查看分区内持续更新的内容。</p>
     </header>
 
     <div class="panel-list" role="list">
-      {items.length === 0 && (
+      {sectionsWithCounts.length === 0 && (
         <div class="empty-state">
-          <p>还没有任何笔记，等你有内容时再添加吧。</p>
+          <p>还没有笔记分区，可以先在 CMS 里创建一个分区。</p>
         </div>
       )}
 
-      {items.map((item) => (
-        <a class="panel-item" href={`/study/${item.id}`} role="listitem">
+      {sectionsWithCounts.map(({ section, count }) => (
+        <a class="panel-item" href={`/study/${section.id}`} role="listitem">
           <div class="item-main">
-            <h3>{item.data.title}</h3>
-            <p>{item.data.description}</p>
+            <h3>{section.data.title}</h3>
+            <p>{section.data.description}</p>
           </div>
-          <div class="item-meta">{formatEntryDate(item.data.date)}</div>
+          <div class="item-meta">
+            <span>{count} 篇更新</span>
+            <span>{formatEntryDate(section.data.date)}</span>
+          </div>
         </a>
       ))}
     </div>

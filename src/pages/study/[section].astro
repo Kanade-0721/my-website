@@ -1,0 +1,45 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { formatEntryDate, getEntriesInSection, getPublishedSections } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const sections = await getPublishedSections('studySections');
+
+  return sections.map((section) => ({
+    params: { section: section.id },
+    props: { section },
+  }));
+}
+
+const { section } = Astro.props;
+const items = await getEntriesInSection('study', section.id);
+---
+
+<Layout title={`${section.data.title} | 学习笔记`} description={section.data.description}>
+  <section class="glass-panel">
+    <a class="back-link" href="/study/">← 返回笔记分区</a>
+    <header class="panel-header">
+      <p class="panel-eyebrow">Note Section</p>
+      <h2>{section.data.title}</h2>
+      <p class="panel-copy">{section.data.description}</p>
+    </header>
+
+    <div class="panel-list" role="list">
+      {items.length === 0 && (
+        <div class="empty-state">
+          <p>这个分区还没有更新帖。</p>
+        </div>
+      )}
+
+      {items.map((item) => (
+        <a class="panel-item" href={`/study/${section.id}/${item.id}`} role="listitem">
+          <div class="item-main">
+            <h3>{item.data.title}</h3>
+            <p>{item.data.description}</p>
+          </div>
+          <div class="item-meta">{formatEntryDate(item.data.date)}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>

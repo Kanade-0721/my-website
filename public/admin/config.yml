@@ -38,14 +38,33 @@ collections:
           - { label: "音频", name: "audios", widget: "list", default: [] }
       - { label: "正文", name: "body", widget: "markdown" }
 
+  - name: "study_sections"
+    label: "笔记分区"
+    label_singular: "笔记分区"
+    folder: "src/content/study-sections"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "分区名称", name: "title", widget: "string" }
+      - { label: "分区简介", name: "description", widget: "text" }
+      - { label: "创建日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "排序", name: "order", widget: "number", required: false, value_type: "int", hint: "数字越小越靠前；不填则按日期排序。" }
+      - { label: "发布", name: "published", widget: "boolean", default: true }
+      - { label: "封面图", name: "cover", widget: "image", required: false }
+      - { label: "说明", name: "body", widget: "markdown", required: false }
+
   - name: "study"
-    label: "学习笔记"
+    label: "笔记更新"
+    label_singular: "笔记更新"
     folder: "src/content/study"
     create: true
     slug: "{{slug}}"
     extension: "md"
     format: "frontmatter"
     fields:
+      - { label: "所属分区", name: "section", widget: "relation", collection: "study_sections", search_fields: ["title"], display_fields: ["title"], value_field: "{{slug}}" }
       - { label: "标题", name: "title", widget: "string" }
       - { label: "简介", name: "description", widget: "text" }
       - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
@@ -62,14 +81,33 @@ collections:
           - { label: "音频", name: "audios", widget: "list", default: [] }
       - { label: "正文", name: "body", widget: "markdown" }
 
+  - name: "project_sections"
+    label: "项目分区"
+    label_singular: "项目分区"
+    folder: "src/content/project-sections"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "项目名称", name: "title", widget: "string" }
+      - { label: "项目简介", name: "description", widget: "text" }
+      - { label: "创建日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "排序", name: "order", widget: "number", required: false, value_type: "int", hint: "数字越小越靠前；不填则按日期排序。" }
+      - { label: "发布", name: "published", widget: "boolean", default: true }
+      - { label: "封面图", name: "cover", widget: "image", required: false }
+      - { label: "说明", name: "body", widget: "markdown", required: false }
+
   - name: "projects"
-    label: "项目"
+    label: "项目更新"
+    label_singular: "项目更新"
     folder: "src/content/projects"
     create: true
     slug: "{{slug}}"
     extension: "md"
     format: "frontmatter"
     fields:
+      - { label: "所属项目", name: "section", widget: "relation", collection: "project_sections", search_fields: ["title"], display_fields: ["title"], value_field: "{{slug}}" }
       - { label: "标题", name: "title", widget: "string" }
       - { label: "简介", name: "description", widget: "text" }
       - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
