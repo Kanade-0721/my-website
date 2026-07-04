@@ -39,6 +39,11 @@ export async function onRequestGet({ request, env }) {
 
 function oauthPage(type, payload) {
   const message = `authorization:github:${type}:${JSON.stringify(payload)}`;
+  const objectMessage = {
+    type: `authorization:github:${type}`,
+    provider: 'github',
+    ...payload,
+  };
 
   return new Response(
     `<!doctype html>
@@ -47,8 +52,10 @@ function oauthPage(type, payload) {
     <script>
       (function() {
         var message = ${JSON.stringify(message)};
+        var objectMessage = ${JSON.stringify(objectMessage)};
         if (window.opener) {
           window.opener.postMessage(message, '*');
+          window.opener.postMessage(objectMessage, '*');
           window.close();
         } else {
           document.body.textContent = 'Authentication complete. You can close this window.';
