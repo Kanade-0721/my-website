@@ -1,12 +1,14 @@
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
+  const clientId = env.GITHUB_CLIENT_ID || env.GITHUB_OAUTH_CLIENT_ID;
+  const clientSecret = env.GITHUB_CLIENT_SECRET || env.GITHUB_OAUTH_CLIENT_SECRET;
 
   if (!code) {
     return oauthPage('error', { message: 'GitHub did not return an authorization code.' });
   }
 
-  if (!env.GITHUB_OAUTH_CLIENT_ID || !env.GITHUB_OAUTH_CLIENT_SECRET) {
+  if (!clientId || !clientSecret) {
     return oauthPage('error', { message: 'Missing GitHub OAuth environment variables.' });
   }
 
@@ -17,10 +19,9 @@ export async function onRequestGet({ request, env }) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      client_id: env.GITHUB_OAUTH_CLIENT_ID,
-      client_secret: env.GITHUB_OAUTH_CLIENT_SECRET,
+      client_id: clientId,
+      client_secret: clientSecret,
       code,
-      redirect_uri: `${url.origin}/api/callback`,
     }),
   });
   const tokenData = await tokenResponse.json();
@@ -39,11 +40,6 @@ export async function onRequestGet({ request, env }) {
 
 function oauthPage(type, payload) {
   const message = `authorization:github:${type}:${JSON.stringify(payload)}`;
-  const objectMessage = {
-    type: `authorization:github:${type}`,
-    provider: 'github',
-    ...payload,
-  };
 
   return new Response(
     `<!doctype html>
@@ -52,18 +48,20 @@ function oauthPage(type, payload) {
     <script>
       (function() {
         var message = ${JSON.stringify(message)};
-        var objectMessage = ${JSON.stringify(objectMessage)};
+        var receiveMessage = function(event) {
+          if (window.opener) {
+            window.opener.postMessage(message, event.origin);
+            window.removeEventListener('message', receiveMessage, false);
+            window.close();
+          }
+        };
+
+        window.addEventListener('message', receiveMessage, false);
+
         if (window.opener) {
-          window.opener.postMessage(message, '*');
-          window.opener.postMessage(objectMessage, '*');
-          window.close();
+          window.opener.postMessage('authorizing:github', '*');
         } else {
-          localStorage.setItem('decap-oauth-message', message);
-          localStorage.setItem('decap-oauth-object-message', JSON.stringify(objectMessage));
-          document.body.textContent = 'Authentication complete. Returning to the CMS...';
-          window.setTimeout(function() {
-            window.location.replace('/admin/#/');
-          }, 1200);
+          document.body.textContent = 'Authentication complete. Please return to the CMS tab.';
         }
       })();
     </script>
