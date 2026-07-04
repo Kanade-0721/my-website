@@ -427,9 +427,9 @@ main {
 
 .about-grid {
   display: grid;
-  grid-template-columns: 0.95fr 1.05fr;
+  grid-template-columns: minmax(320px, 0.92fr) minmax(0, 1.08fr);
   gap: 28px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .profile-section,
@@ -452,6 +452,13 @@ main {
   flex-direction: column;
   gap: 18px;
   padding: 28px;
+  height: 100%;
+}
+
+.profile-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
 }
 
 .profile-avatar {
@@ -516,18 +523,29 @@ main {
 }
 
 .profile-links {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+  margin-top: auto;
+}
+
+.profile-extra {
+  margin-top: 16px;
 }
 
 .text-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
   color: var(--text);
   text-decoration: none;
   padding: 8px 12px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+  text-align: center;
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
@@ -536,17 +554,176 @@ main {
   transform: translateY(-1px);
 }
 
+.contribution-calendar {
+  width: 100%;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.contribution-calendar__months {
+  display: grid;
+  grid-template-columns: repeat(54, 1fr);
+  gap: 2px;
+  padding-left: 18px;
+  margin-bottom: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.contribution-calendar__months span {
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.contribution-calendar__body {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: 4px;
+}
+
+.contribution-calendar__days {
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 2px;
+  padding-top: 1px;
+}
+
+.contribution-calendar__days span {
+  align-self: center;
+  font-size: 0.68rem;
+  line-height: 1;
+}
+
+.contribution-calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(54, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 2px;
+  min-width: 0;
+}
+
+.contribution-calendar__cell {
+  aspect-ratio: 1;
+  min-width: 0;
+  border-radius: 3px;
+  background: rgba(148, 163, 184, 0.16);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.contribution-calendar__cell[data-level='1'],
+.contribution-calendar__legend i[data-level='1'] {
+  background: #bbf7d0;
+}
+
+.contribution-calendar__cell[data-level='2'],
+.contribution-calendar__legend i[data-level='2'] {
+  background: #4ade80;
+}
+
+.contribution-calendar__cell[data-level='3'],
+.contribution-calendar__legend i[data-level='3'] {
+  background: #22c55e;
+}
+
+.contribution-calendar__cell[data-level='4'],
+.contribution-calendar__legend i[data-level='4'] {
+  background: #15803d;
+}
+
+.contribution-calendar__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.contribution-calendar__legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.contribution-calendar__legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: rgba(148, 163, 184, 0.16);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+:root[data-theme='dark'] .contribution-calendar__cell,
+:root[data-theme='dark'] .contribution-calendar__legend i {
+  background: rgba(148, 163, 184, 0.14);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .contribution-calendar__cell[data-level='1'],
+:root[data-theme='dark'] .contribution-calendar__legend i[data-level='1'] {
+  background: #14532d;
+}
+
+:root[data-theme='dark'] .contribution-calendar__cell[data-level='2'],
+:root[data-theme='dark'] .contribution-calendar__legend i[data-level='2'] {
+  background: #166534;
+}
+
+:root[data-theme='dark'] .contribution-calendar__cell[data-level='3'],
+:root[data-theme='dark'] .contribution-calendar__legend i[data-level='3'] {
+  background: #16a34a;
+}
+
+:root[data-theme='dark'] .contribution-calendar__cell[data-level='4'],
+:root[data-theme='dark'] .contribution-calendar__legend i[data-level='4'] {
+  background: #22c55e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .contribution-calendar__cell,
+  :root:not([data-theme]) .contribution-calendar__legend i {
+    background: rgba(148, 163, 184, 0.14);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  :root:not([data-theme]) .contribution-calendar__cell[data-level='1'],
+  :root:not([data-theme]) .contribution-calendar__legend i[data-level='1'] {
+    background: #14532d;
+  }
+
+  :root:not([data-theme]) .contribution-calendar__cell[data-level='2'],
+  :root:not([data-theme]) .contribution-calendar__legend i[data-level='2'] {
+    background: #166534;
+  }
+
+  :root:not([data-theme]) .contribution-calendar__cell[data-level='3'],
+  :root:not([data-theme]) .contribution-calendar__legend i[data-level='3'] {
+    background: #16a34a;
+  }
+
+  :root:not([data-theme]) .contribution-calendar__cell[data-level='4'],
+  :root:not([data-theme]) .contribution-calendar__legend i[data-level='4'] {
+    background: #22c55e;
+  }
+}
+
 .about-side {
   display: grid;
-  gap: 16px;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  height: 100%;
 }
 
 .about-card {
-  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 22px 24px;
 }
 
 .about-card__header {
-  margin-bottom: 14px;
+  flex-shrink: 0;
+  margin-bottom: 12px;
 }
 
 .about-card__title {
@@ -561,14 +738,16 @@ main {
 
 .project-list {
   display: grid;
-  gap: 12px;
+  align-content: start;
+  gap: 10px;
+  min-height: 0;
 }
 
 .project-item {
   display: block;
   color: inherit;
   text-decoration: none;
-  padding: 12px 0;
+  padding: 10px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   transition: background 0.2s ease, transform 0.2s ease;
 }
@@ -594,6 +773,7 @@ a.project-item:hover {
 .project-item p {
   color: var(--muted);
   font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .project-empty {
@@ -628,6 +808,16 @@ a.project-item:hover {
 @media (max-width: 860px) {
   .about-grid {
     grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .profile-section {
+    height: auto;
+  }
+
+  .about-side {
+    grid-template-rows: none;
+    height: auto;
   }
 }
 
@@ -723,6 +913,10 @@ a.project-item:hover {
 
   .profile-section {
     padding: 22px;
+  }
+
+  .profile-links {
+    grid-template-columns: 1fr;
   }
 
   .profile-meta li {

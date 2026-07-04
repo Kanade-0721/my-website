@@ -24,7 +24,13 @@ collections:
     fields:
       - { label: "标题", name: "title", widget: "string" }
       - { label: "简介", name: "description", widget: "text" }
-      - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - label: "日期"
+        name: "date"
+        widget: "datetime"
+        default: "{{now}}"
+        date_format: "YYYY-MM-DD"
+        time_format: "HH:mm"
+        format: "YYYY-MM-DD HH:mm"
       - { label: "发布", name: "published", widget: "boolean", default: true }
       - { label: "标签", name: "tags", widget: "list", default: [] }
       - { label: "封面图", name: "cover", widget: "image", required: false }
@@ -49,7 +55,13 @@ collections:
     fields:
       - { label: "分区名称", name: "title", widget: "string" }
       - { label: "分区简介", name: "description", widget: "text" }
-      - { label: "创建日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - label: "创建日期"
+        name: "date"
+        widget: "datetime"
+        default: "{{now}}"
+        date_format: "YYYY-MM-DD"
+        time_format: "HH:mm"
+        format: "YYYY-MM-DD HH:mm"
       - { label: "排序", name: "order", widget: "number", required: false, value_type: "int", hint: "数字越小越靠前；不填则按日期排序。" }
       - { label: "发布", name: "published", widget: "boolean", default: true }
       - { label: "封面图", name: "cover", widget: "image", required: false }
@@ -67,7 +79,13 @@ collections:
       - { label: "所属分区", name: "section", widget: "relation", collection: "study_sections", search_fields: ["title"], display_fields: ["title"], value_field: "{{slug}}" }
       - { label: "标题", name: "title", widget: "string" }
       - { label: "简介", name: "description", widget: "text" }
-      - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - label: "日期"
+        name: "date"
+        widget: "datetime"
+        default: "{{now}}"
+        date_format: "YYYY-MM-DD"
+        time_format: "HH:mm"
+        format: "YYYY-MM-DD HH:mm"
       - { label: "发布", name: "published", widget: "boolean", default: true }
       - { label: "标签", name: "tags", widget: "list", default: [] }
       - { label: "封面图", name: "cover", widget: "image", required: false }
@@ -92,7 +110,13 @@ collections:
     fields:
       - { label: "项目名称", name: "title", widget: "string" }
       - { label: "项目简介", name: "description", widget: "text" }
-      - { label: "创建日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - label: "创建日期"
+        name: "date"
+        widget: "datetime"
+        default: "{{now}}"
+        date_format: "YYYY-MM-DD"
+        time_format: "HH:mm"
+        format: "YYYY-MM-DD HH:mm"
       - { label: "排序", name: "order", widget: "number", required: false, value_type: "int", hint: "数字越小越靠前；不填则按日期排序。" }
       - { label: "发布", name: "published", widget: "boolean", default: true }
       - { label: "封面图", name: "cover", widget: "image", required: false }
@@ -110,7 +134,13 @@ collections:
       - { label: "所属项目", name: "section", widget: "relation", collection: "project_sections", search_fields: ["title"], display_fields: ["title"], value_field: "{{slug}}" }
       - { label: "标题", name: "title", widget: "string" }
       - { label: "简介", name: "description", widget: "text" }
-      - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - label: "日期"
+        name: "date"
+        widget: "datetime"
+        default: "{{now}}"
+        date_format: "YYYY-MM-DD"
+        time_format: "HH:mm"
+        format: "YYYY-MM-DD HH:mm"
       - { label: "发布", name: "published", widget: "boolean", default: true }
       - { label: "标签", name: "tags", widget: "list", default: [] }
       - { label: "封面图", name: "cover", widget: "image", required: false }

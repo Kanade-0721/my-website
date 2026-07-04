@@ -1,0 +1,97 @@
+---
+type Contribution = {
+  date: string;
+  count: number;
+};
+
+const { contributions = [], totalPosts = 0 } = Astro.props;
+const contributionMap = new Map<string, number>(
+  contributions.map((item: Contribution) => [item.date, item.count]),
+);
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const year = today.getFullYear();
+const start = new Date(year, 0, 1);
+const end = new Date(year, 11, 31);
+const totalDays = Math.floor((end.getTime() - start.getTime()) / 86400000) + 1;
+
+const dayLabels = [
+  { label: '一', row: 2 },
+  { label: '三', row: 4 },
+  { label: '五', row: 6 },
+];
+const monthLabels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+
+const toDateKey = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const days = Array.from({ length: totalDays }, (_, index) => {
+  const date = new Date(start);
+  date.setDate(start.getDate() + index);
+  const key = toDateKey(date);
+  const count = contributionMap.get(key) ?? 0;
+  const week = Math.floor((index + start.getDay()) / 7) + 1;
+  const day = date.getDay() + 1;
+
+  return {
+    key,
+    count,
+    week,
+    day,
+    label: `${key}: ${count} 篇更新`,
+    level: Math.min(count, 4),
+  };
+});
+
+const monthMarkers = days
+  .filter((day) => new Date(day.key).getDate() === 1)
+  .map((day) => ({
+    label: monthLabels[new Date(day.key).getMonth()],
+    week: day.week,
+  }));
+---
+
+<section class="contribution-calendar" aria-label="网站更新频率">
+  <div class="contribution-calendar__months" aria-hidden="true">
+    {monthMarkers.map((month) => (
+      <span style={`grid-column: ${month.week};`}>{month.label}</span>
+    ))}
+  </div>
+
+  <div class="contribution-calendar__body">
+    <div class="contribution-calendar__days" aria-hidden="true">
+      {dayLabels.map((day) => <span style={`grid-row: ${day.row};`}>{day.label}</span>)}
+    </div>
+
+    <div class="contribution-calendar__grid">
+      {days.map((day) => (
+        <span
+          class="contribution-calendar__cell"
+          data-level={day.level}
+          style={`grid-column: ${day.week}; grid-row: ${day.day};`}
+          title={day.label}
+          aria-label={day.label}
+        />
+      ))}
+    </div>
+  </div>
+
+  <div class="contribution-calendar__footer">
+    <span>总 post 数：{totalPosts}</span>
+    <div class="contribution-calendar__legend" aria-hidden="true">
+      <span>少</span>
+      <i data-level="0"></i>
+      <i data-level="1"></i>
+      <i data-level="2"></i>
+      <i data-level="3"></i>
+      <i data-level="4"></i>
+      <span>多</span>
+    </div>
+  </div>
+</section>

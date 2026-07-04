@@ -29,6 +29,10 @@ const {
       <li><span>{statusLabel}</span><strong>{role}</strong></li>
     </ul>
 
+    <div class="profile-extra">
+      <slot name="extra" />
+    </div>
+
     <div class="profile-links">
       <slot name="links" />
     </div>

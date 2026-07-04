@@ -1,23 +1,58 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import AboutCard from '../components/AboutCard.astro';
+import ContributionCalendar from '../components/ContributionCalendar.astro';
 import ProfileSection from '../components/ProfileSection.astro';
 import ProjectList from '../components/ProjectList.astro';
-import SkillTags from '../components/SkillTags.astro';
-import { formatEntryDate, getPublishedEntries } from '../lib/content';
+import { formatEntryDate, getEntriesInSection, getPublishedEntries, getPublishedSections } from '../lib/content';
 
 const title = 'Kanade 的小窗 | 关于我';
 const description = '关于 Kanade 的简要介绍';
 
-const latestProjects = (await getPublishedEntries('projects')).slice(0, 3);
-const projects = latestProjects.map((project) => ({
-  name: project.data.title,
-  description: project.data.description,
-  status: formatEntryDate(project.data.date),
-  href: `/projects/${project.data.section}/${project.id}`,
-}));
+const toDateKey = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
-const skills = ['Astro', 'React', 'TypeScript', 'CSS', 'Figma', 'Git'];
+async function getRecentSections(sectionCollection, entryCollection, basePath) {
+  const sections = await getPublishedSections(sectionCollection);
+  const sectionsWithLatest = await Promise.all(
+    sections.map(async (section) => {
+      const entries = await getEntriesInSection(entryCollection, section.id);
+      const latestEntry = entries[0];
+      const latestDate = latestEntry?.data.date ?? section.data.date;
+
+      return {
+        name: section.data.title,
+        description: latestEntry ? latestEntry.data.title : '暂无更新',
+        status: formatEntryDate(latestDate),
+        href: `/${basePath}/${section.id}`,
+        latestDate,
+      };
+    }),
+  );
+
+  return sectionsWithLatest
+    .sort((a, b) => b.latestDate.getTime() - a.latestDate.getTime())
+    .slice(0, 3);
+}
+
+const recentProjectSections = await getRecentSections('projectSections', 'projects', 'projects');
+const recentNoteSections = await getRecentSections('studySections', 'study', 'study');
+
+const allPosts = [
+  ...(await getPublishedEntries('blog')),
+  ...(await getPublishedEntries('study')),
+  ...(await getPublishedEntries('projects')),
+];
+const contributionCounts = allPosts.reduce((counts, post) => {
+  const key = toDateKey(post.data.date);
+  counts.set(key, (counts.get(key) ?? 0) + 1);
+  return counts;
+}, new Map());
+const contributions = Array.from(contributionCounts, ([date, count]) => ({ date, count }));
 ---
 
 <Layout title={title} description={description}>
@@ -38,18 +73,22 @@ const skills = ['Astro', 'React', 'TypeScript', 'CSS', 'Figma', 'Git'];
             今天总是和昨天不一样，所以很珍贵
           </Fragment>
           <Fragment slot="links">
-            <a class="text-link" href="/blog/">博客</a>
-            <a class="text-link" href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
+            <a class="text-link" href="/blog/">Blog</a>
+            <a class="text-link" href="https://github.com/Kanade-0721" target="_blank" rel="noreferrer">GitHub</a>
+            <a class="text-link" href="mailto:kanade0721@126.com">邮箱</a>
+          </Fragment>
+          <Fragment slot="extra">
+            <ContributionCalendar contributions={contributions} totalPosts={allPosts.length} />
           </Fragment>
         </ProfileSection>
 
         <div class="about-side">
-          <AboutCard title="近期项目" subtitle="最近更新的三个项目">
-            <ProjectList projects={projects} />
+          <AboutCard title="近期项目" subtitle="最近更新的三个项目分区">
+            <ProjectList projects={recentProjectSections} emptyText="项目分区创建后，会自动显示最近更新的三个分区。" />
           </AboutCard>
 
-          <AboutCard title="正在学习" subtitle="持续扩展的技能栈">
-            <SkillTags items={skills} />
+          <AboutCard title="正在学习" subtitle="最近更新的三个笔记分区">
+            <ProjectList projects={recentNoteSections} emptyText="笔记分区创建后，会自动显示最近更新的三个分区。" />
           </AboutCard>
         </div>
       </div>
