@@ -1,10 +1,179 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const title = 'Kanade的小窝-更新日志';
-const description = 'Kanade 网站的更新记录';
+const title = 'Kanade 的小窗 | 更新日志';
+const description = 'Kanade 网站近期功能、内容管理和体验优化记录';
+
+const updates = [
+  {
+    date: '2026-07-05',
+    title: 'CMS 与 Cloudflare 迁移整理完成',
+    items: [
+      '将内容管理方式调整为 Git-based CMS，文章、笔记和项目内容会保存为仓库中的 Markdown 文件。',
+      'CMS 后台改为 Decap CMS，并接入 GitHub OAuth 与 Cloudflare Pages Functions 登录流程。',
+      '网站部署目标从 Netlify 迁移到 Cloudflare Pages，保留静态站点构建方式。',
+      '移除了 Netlify Identity、Git Gateway 以及一键发布 READY 草稿的后台功能。',
+      '新增 CMS 返回主站按钮，并优化后台工作区，避免被主站导航栏遮挡。',
+      '增强手机端 CMS 适配，让后台在小屏幕上更接近全屏编辑体验。',
+    ],
+  },
+  {
+    date: '2026-07-05',
+    title: '文章与媒体体验优化',
+    items: [
+      '详情页图片支持点击查看大图，适用于正文图片和媒体区图片。',
+      '新增图片灯箱关闭按钮、遮罩层和页面滚动锁定，查看原图时更稳定。',
+      '确认 CMS 媒体资源通过上传保存到站点目录，不需要手动填写外部媒体 URL。',
+      '通过 CMS 发布了第一篇博客，并验证博客详情页可以正常生成。',
+    ],
+  },
+  {
+    date: '2026-07-05',
+    title: '移动端导航可读性优化',
+    items: [
+      '降低手机端汉堡菜单展开框的透明感，改成更接近实体的浮层背景。',
+      '为浅色和深色模式分别增强菜单边框、阴影和背景遮挡。',
+      '调整移动端菜单链接的悬停和当前页状态，让导航文字更清楚。',
+    ],
+  },
+  {
+    date: '2026-07-04',
+    title: '内容系统基础搭建',
+    items: [
+      '新增 Astro Content Collections，用于统一管理 blog、study 和 projects 内容。',
+      '新增内容读取工具，将 Markdown 内容接入列表页和详情页。',
+      '整理 CMS 使用说明和发帖指南，记录草稿、发布、媒体上传和同步仓库的基本流程。',
+    ],
+  },
+  {
+    date: '2026-07-04',
+    title: '网站基础框架搭建',
+    items: [
+      '搭建 Astro 静态网站项目结构，建立 layouts、pages、components、styles 等基础目录。',
+      '新增全局 Layout，统一页面头部信息、主导航、页脚、阅读进度条和主题切换逻辑。',
+      '完成首页框架，加入个人介绍、主要入口和站点内容导航。',
+      '搭建 About 页面，并拆分 ProfileSection、AboutCard、ProjectList、SkillTags 等复用组件。',
+      '建立 Blog、Study、Projects 三类内容列表页，以及对应的动态详情页路由。',
+      '新增图片、视频、音频媒体展示页，为项目和文章的素材展示预留入口。',
+      '新增 Contact 页面和 Changelog 页面入口，让站点具备完整的信息架构。',
+      '完成全局视觉风格，包括玻璃质感面板、响应式布局、深浅色主题和移动端汉堡导航。',
+    ],
+  },
+];
 ---
 
 <Layout title={title} description={description}>
-  <h2>更新日志</h2>
+  <section class="changelog-hero">
+    <p class="panel-eyebrow">Changelog</p>
+    <h1>更新日志</h1>
+    <p>记录网站从基础框架、静态展示页，到可维护内容系统的每一步调整。</p>
+  </section>
+
+  <section class="changelog-list" aria-label="网站更新记录">
+    {updates.map((update) => (
+      <article class="changelog-entry">
+        <time datetime={update.date}>{update.date}</time>
+        <div class="changelog-card">
+          <h2>{update.title}</h2>
+          <ul>
+            {update.items.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+      </article>
+    ))}
+  </section>
 </Layout>
+
+<style>
+  .changelog-hero {
+    margin: 0 auto 28px;
+    max-width: 860px;
+  }
+
+  .changelog-hero h1 {
+    margin-bottom: 10px;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.1;
+  }
+
+  .changelog-hero p:not(.panel-eyebrow) {
+    max-width: 680px;
+    color: var(--muted);
+  }
+
+  .changelog-list {
+    display: grid;
+    gap: 18px;
+    width: min(860px, 100%);
+    margin: 0 auto;
+  }
+
+  .changelog-entry {
+    display: grid;
+    grid-template-columns: 116px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .changelog-entry time {
+    position: sticky;
+    top: 92px;
+    color: var(--muted);
+    font-size: 0.92rem;
+    font-weight: 700;
+  }
+
+  .changelog-card {
+    padding: 22px 24px;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 20px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.1);
+  }
+
+  .changelog-card h2 {
+    margin-bottom: 12px;
+    font-size: 1.18rem;
+  }
+
+  .changelog-card ul {
+    display: grid;
+    gap: 8px;
+    padding-left: 1.1rem;
+    color: var(--text);
+  }
+
+  .changelog-card li::marker {
+    color: #60a5fa;
+  }
+
+  :global(:root[data-theme='dark']) .changelog-card {
+    background: rgba(15, 23, 42, 0.62);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 40px rgba(2, 6, 23, 0.28);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme])) .changelog-card {
+      background: rgba(15, 23, 42, 0.62);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 16px 40px rgba(2, 6, 23, 0.28);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .changelog-entry {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .changelog-entry time {
+      position: static;
+    }
+
+    .changelog-card {
+      padding: 18px;
+      border-radius: 16px;
+    }
+  }
+</style>
