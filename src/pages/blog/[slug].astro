@@ -26,7 +26,7 @@ const tagText = post.data.tags.length > 0 ? ` · ${post.data.tags.join(' · ')}`
       <h1>{post.data.title}</h1>
       <p class="detail-meta">{formatEntryDate(post.data.date)}{tagText}</p>
     </header>
-    {post.data.cover && <img class="media-image" src={post.data.cover} alt={post.data.title} loading="lazy" />}
+    {post.data.cover && <img class="detail-cover" src={post.data.cover} alt={post.data.title} loading="lazy" />}
     <div class="detail-content">
       <Content />
     </div>
