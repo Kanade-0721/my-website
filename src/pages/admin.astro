@@ -18,6 +18,29 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
 </Layout>
 
 <script is:inline src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+<script is:inline>
+  const normalizeMediaPath = (value) => {
+    if (typeof value !== 'string') return value;
+    return value
+      .replaceAll('public\\uploads\\', '/uploads/')
+      .replaceAll('public/uploads/', '/uploads/')
+      .replaceAll('\\', '/');
+  };
+
+  if (navigator.clipboard?.writeText) {
+    const originalWriteText = navigator.clipboard.writeText.bind(navigator.clipboard);
+    navigator.clipboard.writeText = (text) => originalWriteText(normalizeMediaPath(text));
+  }
+
+  document.addEventListener('copy', (event) => {
+    const selection = window.getSelection()?.toString();
+    const normalized = normalizeMediaPath(selection);
+    if (!selection || selection === normalized) return;
+
+    event.preventDefault();
+    event.clipboardData?.setData('text/plain', normalized);
+  });
+</script>
 
 <style is:global>
   main:has(.admin-workspace) {
