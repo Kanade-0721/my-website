@@ -39,7 +39,11 @@ collections:
         widget: "object"
         collapsed: true
         fields:
-          - { label: "图片", name: "images", widget: "list", default: [] }
+          - label: "图片"
+            name: "images"
+            widget: "list"
+            default: []
+            field: { label: "选择图片", name: "image", widget: "image" }
           - { label: "视频", name: "videos", widget: "list", default: [] }
           - { label: "音频", name: "audios", widget: "list", default: [] }
       - { label: "正文", name: "body", widget: "markdown" }
@@ -94,7 +98,11 @@ collections:
         widget: "object"
         collapsed: true
         fields:
-          - { label: "图片", name: "images", widget: "list", default: [] }
+          - label: "图片"
+            name: "images"
+            widget: "list"
+            default: []
+            field: { label: "选择图片", name: "image", widget: "image" }
           - { label: "视频", name: "videos", widget: "list", default: [] }
           - { label: "音频", name: "audios", widget: "list", default: [] }
       - { label: "正文", name: "body", widget: "markdown" }
@@ -158,7 +166,11 @@ collections:
         widget: "object"
         collapsed: true
         fields:
-          - { label: "图片", name: "images", widget: "list", default: [] }
+          - label: "图片"
+            name: "images"
+            widget: "list"
+            default: []
+            field: { label: "选择图片", name: "image", widget: "image" }
           - { label: "视频", name: "videos", widget: "list", default: [] }
           - { label: "音频", name: "audios", widget: "list", default: [] }
       - { label: "正文", name: "body", widget: "markdown" }
