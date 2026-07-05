@@ -1093,12 +1093,13 @@ a.project-item:hover {
 
 .detail-content img {
   display: block;
-  width: 100%;
-  max-height: 520px;
-  margin: 28px 0;
+  width: auto;
+  max-width: min(620px, 100%);
+  max-height: 360px;
+  margin: 26px auto;
   object-fit: contain;
-  border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 0;
+  border-radius: 10px;
 }
 
 .media-section {

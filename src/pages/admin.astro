@@ -21,10 +21,11 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
 <script is:inline>
   const normalizeMediaPath = (value) => {
     if (typeof value !== 'string') return value;
-    return value
+    const normalized = value
       .replaceAll('public\\uploads\\', '/uploads/')
       .replaceAll('public/uploads/', '/uploads/')
       .replaceAll('\\', '/');
+    return normalized.replace(/^\/?uploads\//, '/uploads/');
   };
 
   if (navigator.clipboard?.writeText) {
