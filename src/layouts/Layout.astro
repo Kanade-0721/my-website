@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+
 const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.props;
 ---
 
@@ -14,42 +15,44 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
   </head>
 
   <body>
-    {!hideChrome && <header id="navbar" class="navbar">
-      <div class="navbar-shell">
-        <a href="/" class="brand" aria-label="返回首页">
-          <span class="brand-mark">K</span>
-          <span class="brand-text">Kanade</span>
-        </a>
+    {!hideChrome && (
+      <header id="navbar" class="navbar">
+        <div class="navbar-shell">
+          <a href="/" class="brand" aria-label="返回首页">
+            <span class="brand-mark">K</span>
+            <span class="brand-text">Kanade</span>
+          </a>
 
-        <button
-          id="menuToggle"
-          class="menu-toggle"
-          type="button"
-          aria-label="切换导航菜单"
-          aria-expanded="false"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+          <button
+            id="menuToggle"
+            class="menu-toggle"
+            type="button"
+            aria-label="切换导航菜单"
+            aria-expanded="false"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
 
-        <nav id="siteNav" class="site-nav" aria-label="主导航">
-          <ul>
-            <li><a href="/study/" data-nav="study">Notes</a></li>
-            <li><a href="/blog/" data-nav="blog">Blog</a></li>
-            <li><a href="/projects/" data-nav="projects">Projects</a></li>
-            <li><a href="/about/" data-nav="about">About</a></li>
-            <li><a href="/admin/" data-nav="admin">CMS</a></li>
-          </ul>
-        </nav>
+          <nav id="siteNav" class="site-nav" aria-label="主导航">
+            <ul>
+              <li><a href="/study/" data-nav="study">Notes</a></li>
+              <li><a href="/blog/" data-nav="blog">Blog</a></li>
+              <li><a href="/projects/" data-nav="projects">Projects</a></li>
+              <li><a href="/about/" data-nav="about">About</a></li>
+              <li><a href="/admin/" data-nav="admin">CMS</a></li>
+            </ul>
+          </nav>
 
-        <div class="navbar-actions">
-          <button id="themeToggle" class="icon-btn" type="button" aria-label="切换主题">🌙</button>
-          <span class="avatar" aria-hidden="true">K</span>
+          <div class="navbar-actions">
+            <button id="themeToggle" class="icon-btn" type="button" aria-label="切换主题">☾</button>
+            <span class="avatar" aria-hidden="true">K</span>
+          </div>
         </div>
-      </div>
-      <div id="progressBar" class="progress-bar" aria-hidden="true"></div>
-    </header>}
+        <div id="progressBar" class="progress-bar" aria-hidden="true"></div>
+      </header>
+    )}
 
     <main>
       <slot />
@@ -57,14 +60,18 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
 
     <div id="imageLightbox" class="image-lightbox" aria-hidden="true">
       <button class="image-lightbox__close" type="button" aria-label="关闭大图">×</button>
+      <button class="image-lightbox__nav image-lightbox__nav--prev" type="button" aria-label="上一张">‹</button>
       <img id="imageLightboxImage" class="image-lightbox__image" alt="" />
+      <button class="image-lightbox__nav image-lightbox__nav--next" type="button" aria-label="下一张">›</button>
     </div>
 
-    {!hideChrome && <footer>
-      <hr />
-      <p>&copy; 2026 Kanade.</p>
-      <p><a href="/changelog/">Recent Updates</a></p>
-    </footer>}
+    {!hideChrome && (
+      <footer>
+        <hr />
+        <p>&copy; 2026 Kanade.</p>
+        <p><a href="/changelog/">Recent Updates</a></p>
+      </footer>
+    )}
 
     <script is:inline>
       const navbar = document.getElementById('navbar');
@@ -77,7 +84,7 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
       const applyTheme = (theme) => {
         document.documentElement.setAttribute('data-theme', theme);
         if (themeToggle) {
-          themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+          themeToggle.textContent = theme === 'dark' ? '☀' : '☾';
         }
       };
 
@@ -153,22 +160,52 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
         }
       });
 
+      let lightboxImages = [];
+      let lightboxIndex = -1;
+
+      const getPageLightboxImages = () =>
+        Array.from(document.querySelectorAll('.detail-panel img, .detail-content img, .media-section img, .media-grid img'))
+          .filter((image) => image instanceof HTMLImageElement && (image.currentSrc || image.src));
+
+      const updateLightboxImage = () => {
+        const lightbox = document.getElementById('imageLightbox');
+        const lightboxImage = document.getElementById('imageLightboxImage');
+        if (!(lightbox instanceof HTMLElement) || !(lightboxImage instanceof HTMLImageElement)) return;
+
+        const currentImage = lightboxImages[lightboxIndex];
+        if (!(currentImage instanceof HTMLImageElement)) return;
+
+        lightboxImage.src = currentImage.currentSrc || currentImage.src;
+        lightboxImage.alt = currentImage.alt || '图片大图';
+        lightbox.classList.toggle('has-multiple', lightboxImages.length > 1);
+      };
+
+      const openLightbox = (image) => {
+        const lightbox = document.getElementById('imageLightbox');
+        if (!(lightbox instanceof HTMLElement)) return;
+
+        lightboxImages = getPageLightboxImages();
+        lightboxIndex = Math.max(0, lightboxImages.indexOf(image));
+        updateLightboxImage();
+        lightbox.classList.add('open');
+        lightbox.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('lightbox-open');
+      };
+
+      const showLightboxImage = (direction) => {
+        if (lightboxImages.length <= 1) return;
+        lightboxIndex = (lightboxIndex + direction + lightboxImages.length) % lightboxImages.length;
+        updateLightboxImage();
+      };
+
       document.addEventListener('click', (event) => {
         const target = event.target;
         const image = target instanceof Element ? target.closest('img') : null;
         if (!(image instanceof HTMLImageElement)) return;
         if (!image.closest('.detail-panel, .detail-content, .media-section, .media-grid')) return;
 
-        const imageUrl = image.currentSrc || image.src;
-        const lightbox = document.getElementById('imageLightbox');
-        const lightboxImage = document.getElementById('imageLightboxImage');
-        if (!imageUrl || !(lightbox instanceof HTMLElement) || !(lightboxImage instanceof HTMLImageElement)) return;
-
-        lightboxImage.src = imageUrl;
-        lightboxImage.alt = image.alt || '图片大图';
-        lightbox.classList.add('open');
-        lightbox.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('lightbox-open');
+        event.preventDefault();
+        openLightbox(image);
       });
 
       const closeLightbox = () => {
@@ -177,13 +214,26 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
         if (!(lightbox instanceof HTMLElement) || !(lightboxImage instanceof HTMLImageElement)) return;
 
         lightbox.classList.remove('open');
+        lightbox.classList.remove('has-multiple');
         lightbox.setAttribute('aria-hidden', 'true');
         lightboxImage.removeAttribute('src');
+        lightboxImages = [];
+        lightboxIndex = -1;
         document.body.classList.remove('lightbox-open');
       };
 
       document.getElementById('imageLightbox')?.addEventListener('click', (event) => {
         const target = event.target;
+        if (target instanceof HTMLElement && target.closest('.image-lightbox__nav--prev')) {
+          event.stopPropagation();
+          showLightboxImage(-1);
+          return;
+        }
+        if (target instanceof HTMLElement && target.closest('.image-lightbox__nav--next')) {
+          event.stopPropagation();
+          showLightboxImage(1);
+          return;
+        }
         if (target instanceof HTMLElement && (target.id === 'imageLightbox' || target.closest('.image-lightbox__close'))) {
           closeLightbox();
         }
@@ -192,6 +242,12 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
       document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
           closeLightbox();
+        }
+        if (event.key === 'ArrowLeft') {
+          showLightboxImage(-1);
+        }
+        if (event.key === 'ArrowRight') {
+          showLightboxImage(1);
         }
       });
     </script>
