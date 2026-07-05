@@ -13,6 +13,11 @@ const mediaSchema = z
     audios: [],
   });
 
+const orderSchema = z.preprocess(
+  (value) => (value === '' || value === null ? undefined : value),
+  z.coerce.number().optional(),
+);
+
 const contentSchema = z.object({
   title: z.string(),
   description: z.string(),
@@ -28,14 +33,14 @@ const sectionSchema = z.object({
   title: z.string(),
   description: z.string(),
   date: z.coerce.date(),
-  order: z.preprocess((value) => (value === '' ? undefined : value), z.coerce.number().optional()),
+  order: orderSchema,
   published: z.boolean().default(true),
   cover: z.string().optional(),
 });
 
 const projectSectionSchema = sectionSchema.extend({
   technologies: z.array(z.string()).default([]),
-  status: z.enum(['进行中', '暂停', '完成']).default('进行中'),
+  status: z.string().default('进行中'),
 });
 
 const sectionedContentSchema = contentSchema.extend({
