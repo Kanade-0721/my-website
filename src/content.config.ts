@@ -28,7 +28,7 @@ const sectionSchema = z.object({
   title: z.string(),
   description: z.string(),
   date: z.coerce.date(),
-  order: z.number().optional(),
+  order: z.preprocess((value) => (value === '' ? undefined : value), z.coerce.number().optional()),
   published: z.boolean().default(true),
   cover: z.string().optional(),
 });
