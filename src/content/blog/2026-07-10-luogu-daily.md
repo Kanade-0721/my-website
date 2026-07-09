@@ -15,12 +15,13 @@ media:
 
 ## 今日概览
 
-今天记录了 1 道题。
+今天记录了 2 道题。
 
 <!-- LUOGU_DAILY_TABLE_START -->
 | 题号 | 题目 | 状态 | 语言 | 标签 |
 | --- | --- | --- | --- | --- |
 | P1001 | [A+B Problem](https://www.luogu.com.cn/problem/P1001) | AC | Python | - |
+| P1024 | [[NOIP 2001 提高组] 一元三次方程求解](https://www.luogu.com.cn/problem/P1024) | AC | Python | 二分 |
 <!-- LUOGU_DAILY_TABLE_END -->
 
 ## 刷题记录
@@ -57,12 +58,77 @@ media:
 
 #### 说明/提示
 
-**数据范围** 对于所有测试数据，$-{10}^9 \le a,b \le {10}^9$。
+**数据范围** 对于所有测试数据，$-{10}^9 \le a,b \le {10}^9$。 **广告** 洛谷出品的算法教材，帮助您更简单地学习基础算法。[【官方网店绝赞热卖中！】>>>](https://item.taobao.com/item.htm?id=637730514783) [![](https://cdn.luogu.com.cn/upload/image_hosting/njc7dlng.png)](https://item.taobao.com/item.htm?id=637730514783) **本题各种语言的程序范例：** C ```c #include int main() { int a,b; scanf("%d%d",&a,&b); printf("%d\n", a+b); return 0; } ``` --------------
+-
+- C++ ```cpp #include #include using namespace std; int main() { int a,b; cin >> a >> b; cout a + b, 0) console.log(result) process.exit() // 请注意必须在出口点处加入此行 ``` ---------------
+-
+- Ruby ```ruby a, b = gets.split.map(&:to_i) print a+b ``` ---------------
+-
+- PHP ```php
 
 ### 代码
 
 ```python
 a,b = map(int,input().split())
 print(a+b)
+```
+
+<!-- LUOGU_DAILY_ITEM {"problemId":"P1024","title":"[NOIP 2001 提高组] 一元三次方程求解","status":"AC","language":"Python","tags":["二分"],"url":"https://www.luogu.com.cn/problem/P1024","idea":"","review":"","code":"a,b,c,d = map(float,input().split())\r\ndef func(n):\r\n    return a*(n*n*n)+b*(n*n)+c*n+d\r\ninf = -100\r\nsup = 100\r\nmis = 0.01\r\ncount = 0\r\nres = []\r\ndef find(inf,sup):\r\n    global count,res\r\n    if sup-inf < mis:\r\n        if func(sup)*func(inf)<0:\r\n            res.append(float((sup+inf)/2))\r\n        return\r\n    mid = (inf+sup)/2\r\n    find(inf,mid)\r\n    find(mid,sup)\r\nfind(inf,sup)\r\nresult = [f\"{x:.2f}\" for x in res]\r\nprint(*result)","statementBase64":"IyMjIyDpopjnm67mj4/ov7AKCuacieW9ouWmgu+8miRhIHheMyArIGIgeF4yICsgYyB4ICsgZCA9IDAkIOi/meagt+eahOS4gOS4quS4gOWFg+S4ieasoeaWueeoi+OAgue7meWHuuivpeaWueeoi+S4reWQhOmhueeahOezu+aVsO+8iCRhLGIsYyxkJCDlnYfkuLrlrp7mlbDvvInvvIzlubbnuqblrpror6XmlrnnqIvlrZjlnKjkuInkuKrkuI3lkIzlrp7moLnvvIjmoLnnmoTojIPlm7TlnKggJC0xMDAkIOiHsyAkMTAwJCDkuYvpl7TvvInvvIzkuJTmoLnkuI7moLnkuYvlt67nmoTnu53lr7nlgLwgJFxnZSAxJOOAguimgeaxgueUseWwj+WIsOWkp+S+neasoeWcqOWQjOS4gOihjOi+k+WHuui/meS4ieS4quWunuaguSjmoLnkuI7moLnkuYvpl7TnlZnmnInnqbrmoLwp77yM5bm257K+56Gu5Yiw5bCP5pWw54K55ZCOICQyJCDkvY3jgIIg5o+Q56S677ya6K6w5pa556iLICRmKHgpID0gMCTvvIzoi6XlrZjlnKggJDIkIOS4quaVsCAkeF8xJCDlkowgJHhfMiTvvIzkuJQgJHhfMQoKIyMjIyDovpPlhaXmoLzlvI8KCuS4gOihjO+8jCQ0JCDkuKrlrp7mlbAgJGEsIGIsIGMsIGQk44CCCgojIyMjIOi+k+WHuuagvOW8jwoK5LiA6KGM77yMJDMkIOS4quWunuague+8jOS7juWwj+WIsOWkp+i+k+WHuu+8jOW5tueyvuehruWIsOWwj+aVsOeCueWQjiAkMiQg5L2N44CCCgojIyMjIOivtOaYji/mj5DnpLoKCioq44CQ6aKY55uu5p2l5rqQ44CRKiogTk9JUCAyMDAxIOaPkOmrmOe7hOesrOS4gOmimA=="} -->
+### P1024 [NOIP 2001 提高组] 一元三次方程求解
+
+- 题目：[[NOIP 2001 提高组] 一元三次方程求解](https://www.luogu.com.cn/problem/P1024)
+- 状态：AC
+- 语言：Python
+- 标签：二分
+
+### 题目原文
+
+#
+
+#### 题目描述
+
+有形如：$a x^3 + b x^2 + c x + d = 0$ 这样的一个一元三次方程。给出该方程中各项的系数（$a,b,c,d$ 均为实数），并约定该方程存在三个不同实根（根的范围在 $-100$ 至 $100$ 之间），且根与根之差的绝对值 $\ge 1$。要求由小到大依次在同一行输出这三个实根(根与根之间留有空格)，并精确到小数点后 $2$ 位。 提示：记方程 $f(x) = 0$，若存在 $2$ 个数 $x_1$ 和 $x_2$，且 $x_1
+
+#
+
+#### 输入格式
+
+一行，$4$ 个实数 $a, b, c, d$。
+
+#
+
+#### 输出格式
+
+一行，$3$ 个实根，从小到大输出，并精确到小数点后 $2$ 位。
+
+#
+
+#### 说明/提示
+
+**【题目来源】** NOIP 2001 提高组第一题
+
+### 代码
+
+```python
+a,b,c,d = map(float,input().split())
+def func(n):
+    return a*(n*n*n)+b*(n*n)+c*n+d
+inf = -100
+sup = 100
+mis = 0.01
+count = 0
+res = []
+def find(inf,sup):
+    global count,res
+    if sup-inf < mis:
+        if func(sup)*func(inf)<0:
+            res.append(float((sup+inf)/2))
+        return
+    mid = (inf+sup)/2
+    find(inf,mid)
+    find(mid,sup)
+find(inf,sup)
+result = [f"{x:.2f}" for x in res]
+print(*result)
 ```
 <!-- LUOGU_DAILY_ENTRIES_END -->
