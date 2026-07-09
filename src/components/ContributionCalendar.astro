@@ -4,10 +4,29 @@ type Contribution = {
   count: number;
 };
 
-const { contributions = [], totalPosts = 0 } = Astro.props;
-const contributionMap = new Map<string, number>(
-  contributions.map((item: Contribution) => [item.date, item.count]),
-);
+type CalendarDataset = {
+  id: string;
+  label: string;
+  totalLabel: string;
+  countUnit: string;
+  tone?: 'green' | 'red';
+  contributions: Contribution[];
+  totalPosts: number;
+};
+
+const fallbackDatasets: CalendarDataset[] = [
+  {
+    id: 'updates',
+    label: '更新日历',
+    totalLabel: '总 post 数',
+    countUnit: '篇更新',
+    tone: 'green',
+    contributions: Astro.props.contributions ?? [],
+    totalPosts: Astro.props.totalPosts ?? 0,
+  },
+];
+
+const datasets: CalendarDataset[] = Astro.props.datasets?.length ? Astro.props.datasets : fallbackDatasets;
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -31,67 +50,119 @@ const toDateKey = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 
-const days = Array.from({ length: totalDays }, (_, index) => {
-  const date = new Date(start);
-  date.setDate(start.getDate() + index);
-  const key = toDateKey(date);
-  const count = contributionMap.get(key) ?? 0;
-  const week = Math.floor((index + start.getDay()) / 7) + 1;
-  const day = date.getDay() + 1;
+const buildDays = (dataset: CalendarDataset) => {
+  const contributionMap = new Map<string, number>(dataset.contributions.map((item) => [item.date, item.count]));
+
+  return Array.from({ length: totalDays }, (_, index) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + index);
+    const key = toDateKey(date);
+    const count = contributionMap.get(key) ?? 0;
+    const week = Math.floor((index + start.getDay()) / 7) + 1;
+    const day = date.getDay() + 1;
+
+    return {
+      key,
+      count,
+      week,
+      day,
+      label: `${key}: ${count} ${dataset.countUnit}`,
+      level: Math.min(count, 4),
+    };
+  });
+};
+
+const calendars = datasets.map((dataset) => {
+  const days = buildDays(dataset);
+  const monthMarkers = days
+    .filter((day) => new Date(day.key).getDate() === 1)
+    .map((day) => ({
+      label: monthLabels[new Date(day.key).getMonth()],
+      week: day.week,
+    }));
 
   return {
-    key,
-    count,
-    week,
-    day,
-    label: `${key}: ${count} 篇更新`,
-    level: Math.min(count, 4),
+    ...dataset,
+    days,
+    monthMarkers,
+    tone: dataset.tone ?? 'green',
   };
 });
-
-const monthMarkers = days
-  .filter((day) => new Date(day.key).getDate() === 1)
-  .map((day) => ({
-    label: monthLabels[new Date(day.key).getMonth()],
-    week: day.week,
-  }));
 ---
 
-<section class="contribution-calendar" aria-label="网站更新频率">
-  <div class="contribution-calendar__months" aria-hidden="true">
-    {monthMarkers.map((month) => (
-      <span style={`grid-column: ${month.week};`}>{month.label}</span>
-    ))}
+<section class="contribution-calendar" aria-label="活跃日历" data-calendar-root>
+  <div class="contribution-calendar__header">
+    <button class="contribution-calendar__toggle" type="button" aria-label="切换日历" data-calendar-toggle>
+      <span aria-hidden="true">›</span>
+    </button>
+    <span data-calendar-title>{calendars[0]?.label}</span>
   </div>
 
-  <div class="contribution-calendar__body">
-    <div class="contribution-calendar__days" aria-hidden="true">
-      {dayLabels.map((day) => <span style={`grid-row: ${day.row};`}>{day.label}</span>)}
-    </div>
+  {calendars.map((calendar, index) => (
+    <div
+      class="contribution-calendar__panel"
+      data-calendar-panel
+      data-label={calendar.label}
+      data-active={index === 0 ? 'true' : 'false'}
+      data-tone={calendar.tone}
+    >
+      <div class="contribution-calendar__months" aria-hidden="true">
+        {calendar.monthMarkers.map((month) => (
+          <span style={`grid-column: ${month.week};`}>{month.label}</span>
+        ))}
+      </div>
 
-    <div class="contribution-calendar__grid">
-      {days.map((day) => (
-        <span
-          class="contribution-calendar__cell"
-          data-level={day.level}
-          style={`grid-column: ${day.week}; grid-row: ${day.day};`}
-          title={day.label}
-          aria-label={day.label}
-        />
-      ))}
-    </div>
-  </div>
+      <div class="contribution-calendar__body">
+        <div class="contribution-calendar__days" aria-hidden="true">
+          {dayLabels.map((day) => <span style={`grid-row: ${day.row};`}>{day.label}</span>)}
+        </div>
 
-  <div class="contribution-calendar__footer">
-    <span>总 post 数：{totalPosts}</span>
-    <div class="contribution-calendar__legend" aria-hidden="true">
-      <span>少</span>
-      <i data-level="0"></i>
-      <i data-level="1"></i>
-      <i data-level="2"></i>
-      <i data-level="3"></i>
-      <i data-level="4"></i>
-      <span>多</span>
+        <div class="contribution-calendar__grid">
+          {calendar.days.map((day) => (
+            <span
+              class="contribution-calendar__cell"
+              data-level={day.level}
+              style={`grid-column: ${day.week}; grid-row: ${day.day};`}
+              title={day.label}
+              aria-label={day.label}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div class="contribution-calendar__footer">
+        <span>{calendar.totalLabel}：{calendar.totalPosts}</span>
+        <div class="contribution-calendar__legend" aria-hidden="true">
+          <span>少</span>
+          <i data-level="0"></i>
+          <i data-level="1"></i>
+          <i data-level="2"></i>
+          <i data-level="3"></i>
+          <i data-level="4"></i>
+          <span>多</span>
+        </div>
+      </div>
     </div>
-  </div>
+  ))}
 </section>
+
+<script>
+  document.querySelectorAll('[data-calendar-root]').forEach((root) => {
+    const button = root.querySelector('[data-calendar-toggle]');
+    const title = root.querySelector('[data-calendar-title]');
+    const panels = Array.from(root.querySelectorAll('[data-calendar-panel]'));
+    let activeIndex = 0;
+
+    button?.addEventListener('click', () => {
+      activeIndex = (activeIndex + 1) % panels.length;
+
+      panels.forEach((panel, index) => {
+        panel.setAttribute('data-active', String(index === activeIndex));
+      });
+
+      if (title) {
+        title.textContent = panels[activeIndex]?.getAttribute('data-label') ?? '';
+      }
+    });
+  });
+</script>

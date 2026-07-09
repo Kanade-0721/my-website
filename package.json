@@ -10,6 +10,7 @@
     "build": "node scripts/normalize-content-paths.mjs && astro build",
     "luogu:add": "node scripts/luogu-daily.mjs",
     "sync": "node scripts/sync.mjs",
+    "oj:push": "node scripts/git-new-oj.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },

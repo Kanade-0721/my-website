@@ -53,6 +53,35 @@ const contributionCounts = allPosts.reduce((counts, post) => {
   return counts;
 }, new Map());
 const contributions = Array.from(contributionCounts, ([date, count]) => ({ date, count }));
+const luoguPosts = (await getPublishedEntries('blog')).filter((post) => post.body?.includes('LUOGU_DAILY_ITEM'));
+const luoguCounts = luoguPosts.reduce((counts, post) => {
+  const key = toDateKey(post.data.date);
+  const solvedCount = post.body.match(/<!-- LUOGU_DAILY_ITEM /g)?.length ?? 0;
+  counts.set(key, (counts.get(key) ?? 0) + solvedCount);
+  return counts;
+}, new Map());
+const luoguContributions = Array.from(luoguCounts, ([date, count]) => ({ date, count }));
+const luoguTotal = luoguContributions.reduce((total, item) => total + item.count, 0);
+const calendarDatasets = [
+  {
+    id: 'updates',
+    label: '更新日历',
+    totalLabel: '总 post 数',
+    countUnit: '篇更新',
+    tone: 'green',
+    contributions,
+    totalPosts: allPosts.length,
+  },
+  {
+    id: 'luogu',
+    label: '刷题日历',
+    totalLabel: '总题数',
+    countUnit: '道题',
+    tone: 'red',
+    contributions: luoguContributions,
+    totalPosts: luoguTotal,
+  },
+];
 ---
 
 <Layout title={title} description={description}>
@@ -78,7 +107,7 @@ const contributions = Array.from(contributionCounts, ([date, count]) => ({ date,
             <a class="text-link" href="mailto:kanade0721@126.com">邮箱</a>
           </Fragment>
           <Fragment slot="extra">
-            <ContributionCalendar contributions={contributions} totalPosts={allPosts.length} />
+            <ContributionCalendar datasets={calendarDatasets} />
           </Fragment>
         </ProfileSection>
 
