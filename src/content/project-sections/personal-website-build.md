@@ -13,6 +13,12 @@ technologies:
   - CSS Scroll Snap
   - Scoped CSS
   - Responsive Design
+  - Node.js CLI
+  - Fetch API
+  - HTML Parsing
+  - XPath
+  - MathJax
+  - Git Automation
 status: 进行中
 order: ""
 published: true
