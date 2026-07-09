@@ -7,7 +7,7 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
 
 <Layout title={title} description={description} hideChrome={true}>
   <section class="admin-workspace">
-    <a class="admin-home-link" href="/" aria-label="返回主站">返回主站</a>
+    <a class="admin-home-link" href="/" aria-label="返回主站" data-admin-home-link>返回主站</a>
     <header class="panel-header">
       <p class="panel-eyebrow">内容管理</p>
       <h2>Git-based CMS</h2>
@@ -19,6 +19,12 @@ const description = '通过 Git-based CMS 管理博客、笔记和项目内容';
 
 <script is:inline src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 <script is:inline>
+  const homeLink = document.querySelector('[data-admin-home-link]');
+  homeLink?.addEventListener('click', (event) => {
+    event.preventDefault();
+    window.location.assign(`${window.location.origin}/`);
+  });
+
   const normalizeMediaPath = (value) => {
     if (typeof value !== 'string') return value;
     const normalized = value
