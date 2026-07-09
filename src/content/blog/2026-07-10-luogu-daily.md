@@ -15,13 +15,14 @@ media:
 
 ## 今日概览
 
-今天记录了 2 道题。
+今天记录了 3 道题。
 
 <!-- LUOGU_DAILY_TABLE_START -->
 | 题号 | 题目 | 状态 | 语言 | 标签 |
 | --- | --- | --- | --- | --- |
 | P1001 | [A+B Problem](https://www.luogu.com.cn/problem/P1001) | AC | Python | - |
 | P1024 | [[NOIP 2001 提高组] 一元三次方程求解](https://www.luogu.com.cn/problem/P1024) | AC | Python | 二分 |
+| P2678 | [[NOIP 2015 提高组] 跳石头](https://www.luogu.com.cn/problem/P2678) | AC | Python | 二分、贪心 |
 <!-- LUOGU_DAILY_TABLE_END -->
 
 ## 刷题记录
@@ -130,5 +131,76 @@ def find(inf,sup):
 find(inf,sup)
 result = [f"{x:.2f}" for x in res]
 print(*result)
+```
+
+<!-- LUOGU_DAILY_ITEM {"problemId":"P2678","title":"[NOIP 2015 提高组] 跳石头","status":"AC","language":"Python","tags":["二分","贪心"],"url":"https://www.luogu.com.cn/problem/P2678","idea":"最短距离的最大值，是典型的二分答案问题。我们假设该值为(L+1)//2，然后从左到右扫描，如果两个石头之间的距离小于该值，则移除石头i，最终得到一个remove，若小于M，则说明该假设值可行，尝试更大的left=mid+1，若大于M，则缩小范围，right = mid-1","review":"","code":"L, N, M = map(int, input().split())\r\nrocks = [0] * (N + 2)\r\nrocks[0] = 0\r\nrocks[N + 1] = L\r\nfor i in range(1, N + 1):\r\n    rocks[i] = int(input())\r\n\r\nleft, right = 1, L\r\nans = 0\r\n\r\nwhile left <= right:\r\n    mid = (left + right) // 2\r\n    removed = 0\r\n    prev = 0\r\n    for i in range(1, N + 2):\r\n        if rocks[i] - rocks[prev] < mid:\r\n            removed += 1\r\n        else:\r\n            prev = i\r\n    if removed <= M:\r\n        ans = mid\r\n        left = mid + 1\r\n    else:\r\n        right = mid - 1\r\n\r\nprint(ans)","statementBase64":"IyMjIyDpopjnm67mj4/ov7AKCuS4gOW5tOS4gOW6pueahOKAnOi3s+efs+WktOKAneavlOi1m+WPiOimgeW8gOWni+S6hu+8gSDov5npobnmr5TotZvlsIblnKjkuIDmnaHnrJTnm7TnmoTmsrPpgZPkuK3ov5vooYzvvIzmsrPpgZPkuK3liIbluIPnnYDkuIDkupvlt6jlpKflsqnnn7PjgILnu4Tlp5TkvJrlt7Lnu4/pgInmi6nlpb3kuobkuKTlnZflsqnnn7PkvZzkuLrmr5TotZvotbfngrnlkoznu4jngrnjgILlnKjotbfngrnlkoznu4jngrnkuYvpl7TvvIzmnIkgJE4kIOWdl+Wyqeefs++8iOS4jeWQq+i1t+eCueWSjOe7iOeCueeahOWyqeefs++8ieOAguWcqOavlOi1m+i/h+eoi+S4re+8jOmAieaJi+S7rOWwhuS7jui1t+eCueWHuuWPke+8jOavj+S4gOatpei3s+WQkeebuOmCu+eahOWyqeefs++8jOebtOiHs+WIsOi+vue7iOeCueOAgiDkuLrkuobmj5Dpq5jmr5TotZvpmr7luqbvvIznu4Tlp5TkvJrorqHliJLnp7votbDkuIDkupvlsqnnn7PvvIzkvb/lvpfpgInmiYvku6zlnKjmr5TotZvov4fnqIvkuK3nmoTmnIDnn63ot7Pot4Pot53nprvlsL3lj6/og73plb/jgILnlLHkuo7pooTnrpfpmZDliLbvvIznu4Tlp5TkvJroh7PlpJrku47otbfngrnlkoznu4jngrnkuYvpl7Tnp7votbAgJE0kIOWdl+Wyqeefs++8iOS4jeiDveenu+i1sOi1t+eCueWSjOe7iOeCueeahOWyqeefs++8ieOAggoKIyMjIyDovpPlhaXmoLzlvI8KCuesrOS4gOihjOWMheWQq+S4ieS4quaVtOaVsCAkTCxOLE0k77yM5YiG5Yir6KGo56S66LW354K55Yiw57uI54K555qE6Led56a777yM6LW354K55ZKM57uI54K55LmL6Ze055qE5bKp55+z5pWw77yM5Lul5Y+K57uE5aeU5Lya6Iez5aSa56e76LWw55qE5bKp55+z5pWw44CC5L+d6K+BICRMIFxnZXEgMSQg5LiUICROIFxnZXEgTSBcZ2VxIDAk44CCIOaOpeS4i+adpSAkTiQg6KGM77yM5q+P6KGM5LiA5Liq5pW05pWw77yM56ysICRpJCDooYznmoTmlbTmlbAgJERfaVwsKCAwCgojIyMjIOi+k+WHuuagvOW8jwoK5LiA5Liq5pW05pWw77yM5Y2z5pyA55+t6Lez6LeD6Led56a755qE5pyA5aSn5YC844CCCgojIyMjIOivtOaYji/mj5DnpLoKCiMjIyDovpPlhaXovpPlh7rmoLfkvosgMSDor7TmmI4g5bCG5LiO6LW354K56Led56a75Li6ICQyJCDlkowgJDE0JCDnmoTkuKTkuKrlsqnnn7Pnp7votbDlkI7vvIzmnIDnn63nmoTot7Pot4Pot53nprvkuLogJDQk77yI5LuO5LiO6LW354K56Led56a7ICQxNyQg55qE5bKp55+z6Lez5Yiw6Led56a7ICQyMSQg55qE5bKp55+z77yM5oiW6ICF5LuO6Led56a7ICQyMSQg55qE5bKp55+z6Lez5Yiw57uI54K577yJ44CCIAoKIyMjIOaVsOaNruinhOaooeS4jue6puWumiDlr7nkuo4gJDIwXCUk55qE5pWw5o2u77yMJDAgXGxlIE0gXGxlIE4gXGxlIDEwJOOAgiDlr7nkuo4gJDUwXCUkIOeahOaVsOaNru+8jCQwIFxsZSBNIFxsZSBOIFxsZSAxMDAk44CCIOWvueS6jiAkMTAwXCUkIOeahOaVsOaNru+8jCQwIFxsZSBNIFxsZSBOIFxsZSA1MDAwMCwxIFxsZSBMIFxsZSAxMF45JOOAgg=="} -->
+### P2678 [NOIP 2015 提高组] 跳石头
+
+- 题目：[[NOIP 2015 提高组] 跳石头](https://www.luogu.com.cn/problem/P2678)
+- 状态：AC
+- 语言：Python
+- 标签：二分、贪心
+
+### 题目原文
+
+#
+
+#### 题目描述
+
+一年一度的“跳石头”比赛又要开始了！ 这项比赛将在一条笔直的河道中进行，河道中分布着一些巨大岩石。组委会已经选择好了两块岩石作为比赛起点和终点。在起点和终点之间，有 $N$ 块岩石（不含起点和终点的岩石）。在比赛过程中，选手们将从起点出发，每一步跳向相邻的岩石，直至到达终点。 为了提高比赛难度，组委会计划移走一些岩石，使得选手们在比赛过程中的最短跳跃距离尽可能长。由于预算限制，组委会至多从起点和终点之间移走 $M$ 块岩石（不能移走起点和终点的岩石）。
+
+#
+
+#### 输入格式
+
+第一行包含三个整数 $L,N,M$，分别表示起点到终点的距离，起点和终点之间的岩石数，以及组委会至多移走的岩石数。保证 $L \geq 1$ 且 $N \geq M \geq 0$。 接下来 $N$ 行，每行一个整数，第 $i$ 行的整数 $D_i\,( 0
+
+#
+
+#### 输出格式
+
+一个整数，即最短跳跃距离的最大值。
+
+#
+
+#### 说明/提示
+
+### 输入输出样例 1 说明 将与起点距离为 $2$ 和 $14$ 的两个岩石移走后，最短的跳跃距离为 $4$（从与起点距离 $17$ 的岩石跳到距离 $21$ 的岩石，或者从距离 $21$ 的岩石跳到终点）。
+
+### 数据规模与约定 对于 $20\%$的数据，$0 \le M \le N \le 10$。 对于 $50\%$ 的数据，$0 \le M \le N \le 100$。 对于 $100\%$ 的数据，$0 \le M \le N \le 50000,1 \le L \le 10^9$。
+
+### 思路
+
+最短距离的最大值，是典型的二分答案问题。我们假设该值为(L+1)//2，然后从左到右扫描，如果两个石头之间的距离小于该值，则移除石头i，最终得到一个remove，若小于M，则说明该假设值可行，尝试更大的left=mid+1，若大于M，则缩小范围，right = mid-1
+
+### 代码
+
+```python
+L, N, M = map(int, input().split())
+rocks = [0] * (N + 2)
+rocks[0] = 0
+rocks[N + 1] = L
+for i in range(1, N + 1):
+    rocks[i] = int(input())
+
+left, right = 1, L
+ans = 0
+
+while left <= right:
+    mid = (left + right) // 2
+    removed = 0
+    prev = 0
+    for i in range(1, N + 2):
+        if rocks[i] - rocks[prev] < mid:
+            removed += 1
+        else:
+            prev = i
+    if removed <= M:
+        ans = mid
+        left = mid + 1
+    else:
+        right = mid - 1
+
+print(ans)
 ```
 <!-- LUOGU_DAILY_ENTRIES_END -->
