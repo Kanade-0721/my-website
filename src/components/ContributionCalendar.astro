@@ -98,52 +98,57 @@ const calendars = datasets.map((dataset) => {
     <span data-calendar-title>{calendars[0]?.label}</span>
   </div>
 
-  {calendars.map((calendar, index) => (
-    <div
-      class="contribution-calendar__panel"
-      data-calendar-panel
-      data-label={calendar.label}
-      data-active={index === 0 ? 'true' : 'false'}
-      data-tone={calendar.tone}
-    >
-      <div class="contribution-calendar__months" aria-hidden="true">
-        {calendar.monthMarkers.map((month) => (
-          <span style={`grid-column: ${month.week};`}>{month.label}</span>
-        ))}
-      </div>
+  <div class="contribution-calendar__flip" data-calendar-flip>
+    <div class="contribution-calendar__flip-inner">
+      {calendars.map((calendar, index) => (
+        <div
+          class="contribution-calendar__panel"
+          data-calendar-panel
+          data-label={calendar.label}
+          data-active={index === 0 ? 'true' : 'false'}
+          data-tone={calendar.tone}
+          data-face={index === 0 ? 'front' : 'back'}
+        >
+          <div class="contribution-calendar__months" aria-hidden="true">
+            {calendar.monthMarkers.map((month) => (
+              <span style={`grid-column: ${month.week};`}>{month.label}</span>
+            ))}
+          </div>
 
-      <div class="contribution-calendar__body">
-        <div class="contribution-calendar__days" aria-hidden="true">
-          {dayLabels.map((day) => <span style={`grid-row: ${day.row};`}>{day.label}</span>)}
-        </div>
+          <div class="contribution-calendar__body">
+            <div class="contribution-calendar__days" aria-hidden="true">
+              {dayLabels.map((day) => <span style={`grid-row: ${day.row};`}>{day.label}</span>)}
+            </div>
 
-        <div class="contribution-calendar__grid">
-          {calendar.days.map((day) => (
-            <span
-              class="contribution-calendar__cell"
-              data-level={day.level}
-              style={`grid-column: ${day.week}; grid-row: ${day.day};`}
-              title={day.label}
-              aria-label={day.label}
-            />
-          ))}
-        </div>
-      </div>
+            <div class="contribution-calendar__grid">
+              {calendar.days.map((day) => (
+                <span
+                  class="contribution-calendar__cell"
+                  data-level={day.level}
+                  style={`grid-column: ${day.week}; grid-row: ${day.day};`}
+                  title={day.label}
+                  aria-label={day.label}
+                />
+              ))}
+            </div>
+          </div>
 
-      <div class="contribution-calendar__footer">
-        <span>{calendar.totalLabel}：{calendar.totalPosts}</span>
-        <div class="contribution-calendar__legend" aria-hidden="true">
-          <span>少</span>
-          <i data-level="0"></i>
-          <i data-level="1"></i>
-          <i data-level="2"></i>
-          <i data-level="3"></i>
-          <i data-level="4"></i>
-          <span>多</span>
+          <div class="contribution-calendar__footer">
+            <span>{calendar.totalLabel}：{calendar.totalPosts}</span>
+            <div class="contribution-calendar__legend" aria-hidden="true">
+              <span>少</span>
+              <i data-level="0"></i>
+              <i data-level="1"></i>
+              <i data-level="2"></i>
+              <i data-level="3"></i>
+              <i data-level="4"></i>
+              <span>多</span>
+            </div>
+          </div>
         </div>
-      </div>
+      ))}
     </div>
-  ))}
+  </div>
 </section>
 
 <script>
@@ -155,6 +160,7 @@ const calendars = datasets.map((dataset) => {
 
     button?.addEventListener('click', () => {
       activeIndex = (activeIndex + 1) % panels.length;
+      root.setAttribute('data-flipped', String(activeIndex === 1));
 
       panels.forEach((panel, index) => {
         panel.setAttribute('data-active', String(index === activeIndex));

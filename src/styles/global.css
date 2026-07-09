@@ -629,8 +629,41 @@ main {
   transform: translateY(-1px);
 }
 
+.contribution-calendar__flip {
+  position: relative;
+  perspective: 900px;
+}
+
+.contribution-calendar__flip-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.contribution-calendar[data-flipped='true'] .contribution-calendar__flip-inner {
+  transform: rotateY(180deg);
+}
+
+.contribution-calendar__panel {
+  width: 100%;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.contribution-calendar__panel[data-face='back'] {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
 .contribution-calendar__panel[data-active='false'] {
-  display: none;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contribution-calendar__flip-inner {
+    transition: none;
+  }
 }
 
 .contribution-calendar__months {
