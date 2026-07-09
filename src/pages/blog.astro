@@ -24,7 +24,11 @@ const items = await getPublishedEntries('blog');
       )}
 
       {items.map((item) => (
-        <a class="panel-item blog-list-item" href={`/blog/${item.id}/`} role="listitem">
+        <a
+          class={`panel-item blog-list-item${item.data.cover ? '' : ' blog-list-item--no-cover'}`}
+          href={`/blog/${item.id}/`}
+          role="listitem"
+        >
           {item.data.cover && (
             <img class="blog-cover-thumb" src={item.data.cover} alt={item.data.title} loading="lazy" />
           )}

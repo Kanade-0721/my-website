@@ -322,6 +322,10 @@ main {
   align-items: center;
 }
 
+.blog-list-item--no-cover {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
 .blog-cover-thumb {
   width: 132px;
   aspect-ratio: 16 / 10;

@@ -76,11 +76,11 @@ async function collectItem(values, reader) {
   const status = values.status ?? (isInteractive ? await ask(reader, '状态，默认 AC：', 'AC') : 'AC');
   const language = values.language ?? (isInteractive ? await ask(reader, '语言，默认 Python：', 'Python') : 'Python');
   const tags = splitTags(values.tags ?? (isInteractive ? await ask(reader, '标签，用逗号分隔，可留空：') : ''));
-  const finalTags = tags.length > 0 ? tags : problem.tags.length > 0 ? problem.tags : existingItem?.tags ?? [];
+  const finalTags = tags.length > 0 ? tags : existingItem?.tags ?? [];
   const idea = values.idea ?? (isInteractive ? await ask(reader, '解题思路，可留空：', existingItem?.idea ?? '') : existingItem?.idea ?? '');
   const review = values.review ?? (isInteractive ? await ask(reader, '复盘/易错点，可留空：') : existingItem?.review ?? '');
   const codeFile = values.codeFile ?? (isInteractive ? await ask(reader, '代码文件路径，可留空：') : '');
-  const code = values.code ?? readTextFile(codeFile) ?? existingItem?.code ?? '';
+  const code = values.code ?? readCodeFile(codeFile) ?? existingItem?.code ?? '';
 
   return {
     problemId,
@@ -110,8 +110,7 @@ async function fetchProblem(problemId, url) {
     if (contentOnlyProblem) {
       const title = cleanupProblemTitle(contentOnlyProblem.title ?? '', problemId);
       const statement = buildProblemStatement(contentOnlyProblem);
-      const tags = extractTagsFromProblemObject(contentOnlyProblem);
-      if (title && statement && tags.length > 0) return { title, statement, tags };
+      if (title && statement) return { title, statement, tags: [] };
     }
 
     const response = await fetch(url, { headers: getRequestHeaders(url) });
@@ -126,49 +125,10 @@ async function fetchProblem(problemId, url) {
       (problem ? buildProblemStatement(problem) : '') ||
       extractStatementByXPath(html) ||
       extractStatementFromHtml(html);
-    const objectTags = extractTagsFromProblemObject(problem);
-    const tags = objectTags.length > 0 ? objectTags : extractTagsByXPath(html);
-
-    return { title, statement, tags };
+    return { title, statement, tags: [] };
   } catch {
     return { title: '', statement: '', tags: [] };
   }
-}
-
-function extractTagsFromProblemObject(problem) {
-  if (!problem || typeof problem !== 'object') return [];
-  const candidates = [
-    problem.tags,
-    problem.labels,
-    problem.keywords,
-    problem.difficultyTags,
-    problem.problemTags,
-  ];
-
-  for (const candidate of candidates) {
-    const tags = normalizeTags(candidate);
-    if (tags.length > 0) return tags;
-  }
-
-  return [];
-}
-
-function normalizeTags(value) {
-  if (!value) return [];
-
-  if (Array.isArray(value)) {
-    return value
-      .map((item) => {
-        if (typeof item === 'string') return item;
-        if (item && typeof item === 'object') return item.name ?? item.title ?? item.label ?? item.content ?? '';
-        return '';
-      })
-      .map(cleanTagText)
-      .filter(Boolean);
-  }
-
-  if (typeof value === 'string') return splitTags(value);
-  return [];
 }
 
 async function fetchContentOnlyProblem(url) {
@@ -248,24 +208,9 @@ function findProblemObject(value) {
 
 function buildProblemStatement(problem) {
   const sections = [];
-  pushSection(sections, '题面', problem.statement, 4);
-  pushSection(sections, '题面', problem.content, 4);
-  pushSection(sections, '题目背景', problem.background, 4);
   pushSection(sections, '题目描述', problem.description, 4);
   pushSection(sections, '输入格式', problem.inputFormat, 4);
   pushSection(sections, '输出格式', problem.outputFormat, 4);
-
-  if (Array.isArray(problem.samples) && problem.samples.length > 0) {
-    const samples = problem.samples
-      .map((sample, index) => {
-        const inputText = Array.isArray(sample) ? sample[0] : sample.input;
-        const outputText = Array.isArray(sample) ? sample[1] : sample.output;
-        return `#### 样例 ${index + 1}\n\n输入：\n\n\`\`\`text\n${inputText ?? ''}\n\`\`\`\n\n输出：\n\n\`\`\`text\n${outputText ?? ''}\n\`\`\``;
-      })
-      .join('\n\n');
-    sections.push(`#### 样例\n\n${samples}`);
-  }
-
   pushSection(sections, '说明/提示', problem.hint, 4);
   return sections.join('\n\n').trim();
 }
@@ -284,51 +229,6 @@ function extractStatementByXPath(html) {
   ]);
 
   return nodeHtml ? htmlToMarkdown(nodeHtml) : '';
-}
-
-function extractTagsByXPath(html) {
-  const nodeHtml = extractInnerHtmlByPath(html, [
-    ['html', 1],
-    ['body', 1],
-    ['div', 1],
-    ['div', 4],
-    ['main', 1],
-    ['div', 1],
-    ['div', 1],
-    ['div', 1],
-    ['div', 1],
-    ['div', 2],
-    ['h3', 1],
-  ]);
-
-  return extractTagsFromHtml(nodeHtml);
-}
-
-function extractTagsFromHtml(html) {
-  const text = decodeHtml(
-    html
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<\/(span|a|div|button)>/gi, '\n')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim(),
-  );
-  const cleaned = text
-    .replace(/^(标签|题目标签|算法标签|Tags?)[:：]?\s*/i, '')
-    .replace(/暂无标签/g, '')
-    .trim();
-
-  return splitTags(cleaned)
-    .flatMap((tag) => tag.split(/\s{2,}|\s+\/\s+|、/))
-    .map(cleanTagText)
-    .filter(Boolean);
-}
-
-function cleanTagText(value) {
-  return String(value ?? '')
-    .replace(/^#+/, '')
-    .replace(/[，,、;；|]+$/g, '')
-    .trim();
 }
 
 function extractInnerHtmlByPath(html, path) {
@@ -394,16 +294,12 @@ function parseHtmlTree(html) {
 function extractStatementFromHtml(html) {
   const sections = [];
   const headings = [
-    '题目背景',
     '题目描述',
     '输入格式',
     '输出格式',
-    '样例',
-    '样例输入',
-    '样例输出',
+    '说明/提示',
     '说明',
     '提示',
-    '说明/提示',
   ];
 
   for (const heading of headings) {
@@ -457,10 +353,29 @@ function normalizeMarkdownSpacing(value) {
 }
 
 function normalizeStatementMarkdown(value) {
-  return normalizeMarkdownSpacing(value).replace(
-    /^### (题面|题目背景|题目描述|输入格式|输出格式|样例|样例输入|样例输出|说明|提示|说明\/提示)$/gm,
+  const normalized = normalizeMarkdownSpacing(value).replace(
+    /^### (题目描述|输入格式|输出格式|说明|提示|说明\/提示)$/gm,
     '#### $1',
   );
+
+  return filterStatementSections(normalized);
+}
+
+function filterStatementSections(markdown) {
+  const allowed = new Set(['题目描述', '输入格式', '输出格式', '说明/提示', '说明', '提示']);
+  const lines = markdown.split('\n');
+  const kept = [];
+  let keep = true;
+
+  for (const line of lines) {
+    const heading = line.match(/^####\s+(.+?)\s*$/);
+    if (heading) {
+      keep = allowed.has(heading[1]);
+    }
+    if (keep) kept.push(line);
+  }
+
+  return kept.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }
 
 function dedupeSections(sections) {
@@ -533,6 +448,13 @@ function readTextFile(filePath) {
     console.log(`未能读取文件：${target}，本次会先留空。`);
     return null;
   }
+}
+
+function readCodeFile(filePath) {
+  const code = readTextFile(filePath);
+  if (code === null) return null;
+
+  return code.replace(/^\uFEFF?([^\r\n]*)(\r?\n|$)/, '');
 }
 
 function stripWrappingQuotes(value) {
