@@ -59,13 +59,7 @@ media:
 
 #### 说明/提示
 
-**数据范围** 对于所有测试数据，$-{10}^9 \le a,b \le {10}^9$。 **广告** 洛谷出品的算法教材，帮助您更简单地学习基础算法。[【官方网店绝赞热卖中！】>>>](https://item.taobao.com/item.htm?id=637730514783) [![](https://cdn.luogu.com.cn/upload/image_hosting/njc7dlng.png)](https://item.taobao.com/item.htm?id=637730514783) **本题各种语言的程序范例：** C ```c #include int main() { int a,b; scanf("%d%d",&a,&b); printf("%d\n", a+b); return 0; } ``` --------------
--
-- C++ ```cpp #include #include using namespace std; int main() { int a,b; cin >> a >> b; cout a + b, 0) console.log(result) process.exit() // 请注意必须在出口点处加入此行 ``` ---------------
--
-- Ruby ```ruby a, b = gets.split.map(&:to_i) print a+b ``` ---------------
--
-- PHP ```php
+**数据范围** 对于所有测试数据，$-{10}^9 \le a,b \le {10}^9$。
 
 ### 代码
 
