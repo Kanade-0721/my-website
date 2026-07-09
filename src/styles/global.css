@@ -1050,12 +1050,44 @@ a.project-item:hover {
 }
 
 @media (max-width: 640px) {
+  .about-shell {
+    padding: 16px 0 28px;
+  }
+
   .about-glass {
-    padding: 24px;
+    width: 100%;
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .about-grid {
+    gap: 16px;
+    width: 100%;
+  }
+
+  .profile-section,
+  .about-card {
+    width: 100%;
+    border-radius: 18px;
+    transform: none;
+  }
+
+  .profile-section:hover,
+  .about-card:hover {
+    transform: none;
   }
 
   .profile-section {
-    padding: 22px;
+    padding: 20px;
+  }
+
+  .about-side {
+    gap: 16px;
+    width: 100%;
+  }
+
+  .about-card {
+    padding: 20px;
   }
 
   .profile-links {
