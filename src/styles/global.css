@@ -1042,7 +1042,8 @@ a.project-item:hover {
 }
 
 .detail-content h2,
-.detail-content h3 {
+.detail-content h3,
+.detail-content h4 {
   margin: 34px 0 12px;
   line-height: 1.25;
 }
@@ -1053,6 +1054,11 @@ a.project-item:hover {
 
 .detail-content h3 {
   font-size: 1.18rem;
+}
+
+.detail-content h4 {
+  margin-top: 26px;
+  font-size: 1.02rem;
 }
 
 .detail-content ul,
@@ -1089,6 +1095,17 @@ a.project-item:hover {
 .detail-content pre code {
   padding: 0;
   background: transparent;
+}
+
+.detail-content mjx-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  padding: 4px 0;
+}
+
+.detail-content mjx-container[display='true'] {
+  margin: 22px 0;
 }
 
 .detail-content img {
