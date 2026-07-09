@@ -542,11 +542,20 @@ function extractExistingStatement(content, problemId) {
   if (statementStart === -1) return '';
 
   const bodyStart = section.indexOf('\n', statementStart);
-  const ideaStart = section.indexOf('\n### 思路', bodyStart);
-  if (bodyStart === -1 || ideaStart === -1) return '';
+  const sectionEnd = findFirstSectionStart(section, bodyStart, ['### 思路', '### 代码', '### 复盘']);
+  if (bodyStart === -1 || sectionEnd === -1) return '';
 
-  const statement = section.slice(bodyStart, ideaStart).trim();
+  const statement = section.slice(bodyStart, sectionEnd).trim();
   return statement === '这次暂时没有读取到题目原文。' ? '' : statement;
+}
+
+function findFirstSectionStart(content, start, headings) {
+  const indexes = headings
+    .map((heading) => content.indexOf(`\n${heading}`, start))
+    .filter((index) => index !== -1);
+
+  if (indexes.length === 0) return content.length;
+  return Math.min(...indexes);
 }
 
 function dedupeItems(items) {
@@ -590,6 +599,7 @@ function buildEntriesSection(items) {
     const codeBlock = item.code
       ? `\n\n### 代码\n\n\`\`\`${languageFence(item.language)}\n${item.code}\n\`\`\``
       : '\n\n### 代码\n\n这次暂时没有记录代码。';
+    const ideaBlock = item.idea ? `\n\n### 思路\n\n${item.idea}` : '';
     const review = item.review ? `\n\n### 复盘\n\n${item.review}` : '';
 
     return `${buildItemComment(item)}
@@ -597,11 +607,7 @@ function buildEntriesSection(items) {
 
 - 题目：[${item.title}](${item.url})
 - 状态：${item.status}
-- 语言：${item.language}${tags}${statementBlock}
-
-### 思路
-
-${item.idea || '这次暂时没有记录思路。'}${codeBlock}${review}`;
+- 语言：${item.language}${tags}${statementBlock}${ideaBlock}${codeBlock}${review}`;
   });
 
   return `${ENTRIES_START}
