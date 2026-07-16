@@ -1204,6 +1204,7 @@ a.project-item:hover {
   max-width: 720px;
   margin: 0 auto;
   font-size: 1.03rem;
+  overflow-wrap: anywhere;
 }
 
 .detail-cover {
@@ -1224,11 +1225,27 @@ a.project-item:hover {
   color: var(--text);
 }
 
+.detail-content > :first-child {
+  margin-top: 0;
+}
+
+.detail-content > :last-child {
+  margin-bottom: 0;
+}
+
+.detail-content h1,
 .detail-content h2,
 .detail-content h3,
-.detail-content h4 {
+.detail-content h4,
+.detail-content h5,
+.detail-content h6 {
+  scroll-margin-top: 110px;
   margin: 34px 0 12px;
   line-height: 1.25;
+}
+
+.detail-content h1 {
+  font-size: 1.75rem;
 }
 
 .detail-content h2 {
@@ -1244,6 +1261,51 @@ a.project-item:hover {
   font-size: 1.02rem;
 }
 
+.detail-content h5,
+.detail-content h6 {
+  margin-top: 24px;
+  font-size: 0.96rem;
+}
+
+.detail-content h6 {
+  color: var(--muted);
+}
+
+.detail-content a {
+  color: #2563eb;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+:root[data-theme="dark"] .detail-content a {
+  color: #7dd3fc;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .detail-content a {
+    color: #7dd3fc;
+  }
+}
+
+.detail-content a:hover {
+  text-decoration-thickness: 0.14em;
+}
+
+.detail-content strong {
+  font-weight: 700;
+}
+
+.detail-content del {
+  color: var(--muted);
+}
+
+.detail-content mark {
+  padding: 0.08em 0.24em;
+  border-radius: 4px;
+  background: rgba(250, 204, 21, 0.34);
+  color: inherit;
+}
+
 .detail-content ul,
 .detail-content ol {
   display: grid;
@@ -1252,12 +1314,91 @@ a.project-item:hover {
   padding-left: 1.35rem;
 }
 
+.detail-content li > ul,
+.detail-content li > ol {
+  margin: 8px 0 0;
+}
+
+.detail-content li > p {
+  margin-bottom: 8px;
+}
+
+.detail-content .contains-task-list {
+  list-style: none;
+  padding-left: 0.2rem;
+}
+
+.detail-content .task-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.detail-content .task-list-item input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.38em;
+  accent-color: #3b82f6;
+}
+
 .detail-content blockquote {
   margin: 24px 0;
   padding: 14px 18px;
   color: var(--muted);
   border-left: 3px solid #60a5fa;
   background: rgba(96, 165, 250, 0.08);
+}
+
+.detail-content blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.detail-content hr {
+  height: 1px;
+  margin: 34px 0;
+  border: 0;
+  background: var(--border);
+}
+
+.detail-content table {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  max-width: 100%;
+  margin: 24px 0;
+  overflow-x: auto;
+  border-spacing: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.detail-content th,
+.detail-content td {
+  min-width: 7rem;
+  padding: 10px 14px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.detail-content th {
+  background: rgba(96, 165, 250, 0.12);
+  font-weight: 700;
+}
+
+.detail-content tr > :last-child {
+  border-right: 0;
+}
+
+.detail-content tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.detail-content tbody tr:nth-child(even) {
+  background: rgba(148, 163, 184, 0.07);
 }
 
 .detail-content code {
@@ -1278,6 +1419,82 @@ a.project-item:hover {
 .detail-content pre code {
   padding: 0;
   background: transparent;
+}
+
+.detail-content kbd {
+  display: inline-block;
+  padding: 0.08em 0.42em;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--surface-strong);
+  font: 0.88em/1.5 "Consolas", "Courier New", monospace;
+  box-shadow: 0 1px 2px var(--shadow);
+}
+
+.detail-content details {
+  margin: 22px 0;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(148, 163, 184, 0.06);
+}
+
+.detail-content summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.detail-content details[open] summary {
+  margin-bottom: 12px;
+}
+
+.detail-content dl {
+  margin: 0 0 20px;
+}
+
+.detail-content dt {
+  margin-top: 14px;
+  font-weight: 700;
+}
+
+.detail-content dd {
+  margin-left: 1.25rem;
+  color: var(--muted);
+}
+
+.detail-content figure {
+  margin: 26px 0;
+}
+
+.detail-content figcaption {
+  margin-top: -16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.detail-content iframe,
+.detail-content video {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 24px auto;
+  border: 0;
+  border-radius: 12px;
+}
+
+.detail-content .footnotes {
+  margin-top: 38px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.detail-content sup a {
+  padding: 0 0.12em;
+  text-decoration: none;
 }
 
 .detail-content mjx-container {
