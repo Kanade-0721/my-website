@@ -55,6 +55,28 @@ collections:
                 multiple: true
           - { label: "视频", name: "videos", widget: "list", default: [] }
           - { label: "音频", name: "audios", widget: "list", default: [] }
+      - label: "代码工程阅读器"
+        name: "codeProject"
+        widget: "object"
+        required: false
+        collapsed: true
+        hint: "启用后，帖子正文下方会显示类似 VS Code 的只读文件目录和代码阅读器。请先将整个代码文件夹压缩为 ZIP。"
+        fields:
+          - { label: "启用代码工程展示", name: "enabled", widget: "boolean", default: false }
+          - label: "工程 ZIP"
+            name: "archive"
+            widget: "file"
+            required: false
+            choose_url: false
+            allow_multiple: false
+            media_folder: "/src/code-project-archives"
+            public_folder: "/src/code-project-archives"
+            hint: "最大 20 MB；不要包含 .env、私钥、node_modules、dist 等文件。"
+            media_library:
+              config:
+                max_file_size: 20971520
+          - { label: "默认打开文件", name: "entry", widget: "string", required: false, hint: "相对于 ZIP 根目录，例如 src/main.py；不填则打开第一个文本文件。" }
+          - { label: "阅读器标题", name: "title", widget: "string", required: false, hint: "不填则使用帖子标题。" }
       - { label: "正文", name: "body", widget: "markdown" }
 
   - name: "study_sections"
@@ -127,6 +149,28 @@ collections:
                 multiple: true
           - { label: "视频", name: "videos", widget: "list", default: [] }
           - { label: "音频", name: "audios", widget: "list", default: [] }
+      - label: "代码工程阅读器"
+        name: "codeProject"
+        widget: "object"
+        required: false
+        collapsed: true
+        hint: "启用后，帖子正文下方会显示类似 VS Code 的只读文件目录和代码阅读器。请先将整个代码文件夹压缩为 ZIP。"
+        fields:
+          - { label: "启用代码工程展示", name: "enabled", widget: "boolean", default: false }
+          - label: "工程 ZIP"
+            name: "archive"
+            widget: "file"
+            required: false
+            choose_url: false
+            allow_multiple: false
+            media_folder: "/src/code-project-archives"
+            public_folder: "/src/code-project-archives"
+            hint: "最大 20 MB；不要包含 .env、私钥、node_modules、dist 等文件。"
+            media_library:
+              config:
+                max_file_size: 20971520
+          - { label: "默认打开文件", name: "entry", widget: "string", required: false, hint: "相对于 ZIP 根目录，例如 src/main.py；不填则打开第一个文本文件。" }
+          - { label: "阅读器标题", name: "title", widget: "string", required: false, hint: "不填则使用帖子标题。" }
       - { label: "正文", name: "body", widget: "markdown" }
 
   - name: "project_sections"
@@ -208,4 +252,26 @@ collections:
                 multiple: true
           - { label: "视频", name: "videos", widget: "list", default: [] }
           - { label: "音频", name: "audios", widget: "list", default: [] }
+      - label: "代码工程阅读器"
+        name: "codeProject"
+        widget: "object"
+        required: false
+        collapsed: true
+        hint: "启用后，帖子正文下方会显示类似 VS Code 的只读文件目录和代码阅读器。请先将整个代码文件夹压缩为 ZIP。"
+        fields:
+          - { label: "启用代码工程展示", name: "enabled", widget: "boolean", default: false }
+          - label: "工程 ZIP"
+            name: "archive"
+            widget: "file"
+            required: false
+            choose_url: false
+            allow_multiple: false
+            media_folder: "/src/code-project-archives"
+            public_folder: "/src/code-project-archives"
+            hint: "最大 20 MB；不要包含 .env、私钥、node_modules、dist 等文件。"
+            media_library:
+              config:
+                max_file_size: 20971520
+          - { label: "默认打开文件", name: "entry", widget: "string", required: false, hint: "相对于 ZIP 根目录，例如 src/main.py；不填则打开第一个文本文件。" }
+          - { label: "阅读器标题", name: "title", widget: "string", required: false, hint: "不填则使用帖子标题。" }
       - { label: "正文", name: "body", widget: "markdown" }

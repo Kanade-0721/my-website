@@ -18,6 +18,31 @@ const orderSchema = z.preprocess(
   z.coerce.number().optional(),
 );
 
+const optionalStringSchema = z.preprocess(
+  (value) => (value === '' || value === null ? undefined : value),
+  z.string().optional(),
+);
+
+const codeProjectSchema = z.preprocess(
+  (value) => (value === '' || value === null ? undefined : value),
+  z
+    .object({
+      enabled: z.boolean().default(false),
+      archive: optionalStringSchema,
+      entry: optionalStringSchema,
+      title: optionalStringSchema,
+    })
+    .refine((value) => !value.enabled || Boolean(value.archive), {
+      message: '启用代码工程展示时必须上传 ZIP 压缩包',
+      path: ['archive'],
+    })
+    .refine((value) => !value.archive || /\.zip$/i.test(value.archive), {
+      message: '代码工程必须使用 ZIP 压缩包',
+      path: ['archive'],
+    })
+    .optional(),
+);
+
 const contentSchema = z.object({
   title: z.string(),
   description: z.string(),
@@ -27,6 +52,7 @@ const contentSchema = z.object({
   tags: z.array(z.string()).default([]),
   cover: z.string().optional(),
   media: mediaSchema,
+  codeProject: codeProjectSchema,
 });
 
 const sectionSchema = z.object({

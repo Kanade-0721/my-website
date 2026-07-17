@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import CodeProjectViewer from '../../components/CodeProjectViewer.astro';
 import { render } from 'astro:content';
 import { formatEntryDate, getPublishedEntries } from '../../lib/content';
 
@@ -30,6 +31,13 @@ const tagText = post.data.tags.length > 0 ? ` · ${post.data.tags.join(' · ')}`
     <div class="detail-content">
       <Content />
     </div>
+    {post.data.codeProject?.enabled && post.data.codeProject.archive && (
+      <CodeProjectViewer
+        archive={post.data.codeProject.archive}
+        entry={post.data.codeProject.entry}
+        title={post.data.codeProject.title ?? post.data.title}
+      />
+    )}
     {(media.images.length > 0 || media.videos.length > 0 || media.audios.length > 0) && (
       <section class="media-section">
         <h3>Attached media</h3>

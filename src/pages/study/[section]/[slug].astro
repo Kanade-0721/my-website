@@ -1,5 +1,6 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+import CodeProjectViewer from '../../../components/CodeProjectViewer.astro';
 import { render } from 'astro:content';
 import { formatEntryDate, getPublishedEntries, getPublishedSections } from '../../../lib/content';
 
@@ -36,6 +37,13 @@ const tagText = note.data.tags.length > 0 ? ` · ${note.data.tags.join(' · ')}`
     <div class="detail-content">
       <Content />
     </div>
+    {note.data.codeProject?.enabled && note.data.codeProject.archive && (
+      <CodeProjectViewer
+        archive={note.data.codeProject.archive}
+        entry={note.data.codeProject.entry}
+        title={note.data.codeProject.title ?? note.data.title}
+      />
+    )}
     {(media.images.length > 0 || media.videos.length > 0 || media.audios.length > 0) && (
       <section class="media-section">
         <h3>附加媒体</h3>

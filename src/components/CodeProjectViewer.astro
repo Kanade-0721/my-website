@@ -1,0 +1,623 @@
+---
+interface Props {
+  archive: string;
+  entry?: string;
+  title?: string;
+}
+
+const { archive, entry = '', title = '代码工程' } = Astro.props;
+const archiveName = archive.replaceAll('\\', '/').split('/').pop() ?? 'code-project.zip';
+const projectId = archiveName
+  .replace(/\.[^.]+$/, '')
+  .normalize('NFKC')
+  .replace(/[<>:"/\\|?*\u0000-\u001f]/g, '-')
+  .replace(/[. ]+$/g, '')
+  .trim() || 'code-project';
+const manifestUrl = `/code-projects/${encodeURIComponent(projectId)}/manifest.json`;
+---
+
+<section
+  class="code-project-reader"
+  data-code-project
+  data-manifest-url={manifestUrl}
+  data-entry={entry}
+  aria-label={`${title}代码阅读器`}
+>
+  <header class="code-project-reader__header">
+    <div class="code-project-reader__heading">
+      <button
+        class="code-project-reader__explorer-toggle"
+        type="button"
+        aria-label="打开或关闭文件目录"
+        aria-expanded="false"
+        data-explorer-toggle
+      >
+        ☰
+      </button>
+      <span class="code-project-reader__mark" aria-hidden="true">&lt;/&gt;</span>
+      <div>
+        <p class="code-project-reader__eyebrow">CODE PROJECT</p>
+        <h2>{title}</h2>
+      </div>
+    </div>
+    <span class="code-project-reader__readonly">只读</span>
+  </header>
+
+  <div class="code-project-reader__workspace">
+    <aside class="code-project-reader__explorer" data-explorer aria-label="文件目录">
+      <div class="code-project-reader__explorer-title">EXPLORER</div>
+      <div class="code-project-reader__tree" data-file-tree>
+        <p class="code-project-reader__loading">正在读取文件目录…</p>
+      </div>
+    </aside>
+
+    <div class="code-project-reader__main">
+      <div class="code-project-reader__toolbar">
+        <span class="code-project-reader__path" data-current-path>准备编辑器…</span>
+        <div class="code-project-reader__actions">
+          <button type="button" data-wrap-toggle aria-pressed="false">自动换行</button>
+          <button type="button" data-copy-file disabled>复制</button>
+        </div>
+      </div>
+      <div class="code-project-reader__editor" data-code-editor aria-label="代码内容"></div>
+      <div class="code-project-reader__status" data-reader-status aria-live="polite">正在加载 Monaco Editor…</div>
+    </div>
+  </div>
+</section>
+
+<script>
+  interface ManifestFile {
+    path: string;
+    name: string;
+    size: number;
+    language: string;
+    previewable: boolean;
+    source: string | null;
+  }
+
+  interface Manifest {
+    version: number;
+    id: string;
+    files: ManifestFile[];
+  }
+
+  interface DirectoryNode {
+    name: string;
+    path: string;
+    directories: Map<string, DirectoryNode>;
+    files: ManifestFile[];
+  }
+
+  const formatBytes = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const normalizeEntryPath = (value: string) => value.replaceAll('\\', '/').replace(/^\.\//, '').replace(/^\/+/, '');
+
+  const buildTree = (files: ManifestFile[]): DirectoryNode => {
+    const root: DirectoryNode = { name: '', path: '', directories: new Map(), files: [] };
+
+    files.forEach((file) => {
+      const segments = file.path.split('/').filter(Boolean);
+      const fileName = segments.pop();
+      if (!fileName) return;
+
+      let current = root;
+      segments.forEach((segment) => {
+        const nextPath = current.path ? `${current.path}/${segment}` : segment;
+        if (!current.directories.has(segment)) {
+          current.directories.set(segment, {
+            name: segment,
+            path: nextPath,
+            directories: new Map(),
+            files: [],
+          });
+        }
+        current = current.directories.get(segment)!;
+      });
+      current.files.push(file);
+    });
+
+    return root;
+  };
+
+  const initializeReader = async (root: HTMLElement) => {
+    const manifestUrl = root.dataset.manifestUrl;
+    const requestedEntry = normalizeEntryPath(root.dataset.entry ?? '');
+    const treeContainer = root.querySelector<HTMLElement>('[data-file-tree]');
+    const editorContainer = root.querySelector<HTMLElement>('[data-code-editor]');
+    const currentPath = root.querySelector<HTMLElement>('[data-current-path]');
+    const status = root.querySelector<HTMLElement>('[data-reader-status]');
+    const copyButton = root.querySelector<HTMLButtonElement>('[data-copy-file]');
+    const wrapButton = root.querySelector<HTMLButtonElement>('[data-wrap-toggle]');
+    const explorer = root.querySelector<HTMLElement>('[data-explorer]');
+    const explorerToggle = root.querySelector<HTMLButtonElement>('[data-explorer-toggle]');
+
+    if (!manifestUrl || !treeContainer || !editorContainer || !currentPath || !status || !copyButton || !wrapButton) return;
+
+    try {
+      const manifestResponse = await fetch(manifestUrl);
+      if (!manifestResponse.ok) {
+        throw new Error(`无法读取代码清单（HTTP ${manifestResponse.status}）`);
+      }
+      const manifest = await manifestResponse.json() as Manifest;
+      if (!Array.isArray(manifest.files) || manifest.files.length === 0) {
+        throw new Error('代码包中没有可以展示的文件');
+      }
+
+      const [monaco, editorWorkerModule, jsonWorkerModule, cssWorkerModule, htmlWorkerModule, tsWorkerModule] = await Promise.all([
+        import('monaco-editor'),
+        import('monaco-editor/esm/vs/editor/editor.worker?worker'),
+        import('monaco-editor/esm/vs/language/json/json.worker?worker'),
+        import('monaco-editor/esm/vs/language/css/css.worker?worker'),
+        import('monaco-editor/esm/vs/language/html/html.worker?worker'),
+        import('monaco-editor/esm/vs/language/typescript/ts.worker?worker'),
+      ]);
+
+      const monacoGlobal = globalThis as typeof globalThis & {
+        MonacoEnvironment?: { getWorker: (_moduleId: string, label: string) => Worker };
+      };
+      monacoGlobal.MonacoEnvironment = {
+        getWorker(_moduleId, label) {
+          if (label === 'json') return new jsonWorkerModule.default();
+          if (label === 'css' || label === 'scss' || label === 'less') return new cssWorkerModule.default();
+          if (label === 'html' || label === 'handlebars' || label === 'razor') return new htmlWorkerModule.default();
+          if (label === 'typescript' || label === 'javascript') return new tsWorkerModule.default();
+          return new editorWorkerModule.default();
+        },
+      };
+
+      const getTheme = () => document.documentElement.getAttribute('data-theme') === 'dark' ? 'vs-dark' : 'vs';
+      const editor = monaco.editor.create(editorContainer, {
+        value: '',
+        language: 'plaintext',
+        theme: getTheme(),
+        readOnly: true,
+        domReadOnly: true,
+        automaticLayout: true,
+        fontFamily: 'Consolas, "Cascadia Code", "Courier New", monospace',
+        fontSize: 14,
+        lineHeight: 22,
+        minimap: { enabled: window.innerWidth >= 900 },
+        padding: { top: 14, bottom: 14 },
+        renderWhitespace: 'selection',
+        scrollBeyondLastLine: false,
+        smoothScrolling: true,
+        wordWrap: 'off',
+      });
+
+      let currentFile: ManifestFile | null = null;
+      const fileButtons = new Map<string, HTMLButtonElement>();
+
+      const openFile = async (file: ManifestFile) => {
+        currentFile = file;
+        currentPath.textContent = file.path;
+        copyButton.disabled = true;
+        status.textContent = `正在打开 ${file.name}…`;
+        fileButtons.forEach((button, filePath) => button.classList.toggle('is-active', filePath === file.path));
+
+        if (!file.previewable || !file.source) {
+          editor.setValue(`无法预览二进制文件：${file.path}\n文件大小：${formatBytes(file.size)}`);
+          monaco.editor.setModelLanguage(editor.getModel()!, 'plaintext');
+          status.textContent = '二进制文件仅保留在目录中，不提供网页预览';
+          return;
+        }
+
+        const sourceUrl = new URL(file.source, new URL(manifestUrl, window.location.origin));
+        const response = await fetch(sourceUrl);
+        if (!response.ok) throw new Error(`无法读取 ${file.path}`);
+        const source = await response.text();
+        editor.setValue(source);
+        monaco.editor.setModelLanguage(editor.getModel()!, file.language || 'plaintext');
+        editor.setScrollPosition({ scrollTop: 0, scrollLeft: 0 });
+        copyButton.disabled = false;
+        status.textContent = `${file.language || 'plaintext'} · ${formatBytes(file.size)} · UTF-8`;
+
+        if (window.innerWidth <= 760) {
+          root.classList.remove('is-explorer-open');
+          explorerToggle?.setAttribute('aria-expanded', 'false');
+        }
+      };
+
+      const renderDirectory = (directory: DirectoryNode, depth = 0): DocumentFragment => {
+        const fragment = document.createDocumentFragment();
+        const directories = [...directory.directories.values()].sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
+        const files = [...directory.files].sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
+
+        directories.forEach((childDirectory) => {
+          const row = document.createElement('div');
+          row.className = 'code-project-reader__directory-row';
+          row.style.setProperty('--tree-depth', String(depth));
+
+          const toggle = document.createElement('button');
+          toggle.type = 'button';
+          toggle.className = 'code-project-reader__directory';
+          toggle.setAttribute('aria-expanded', depth < 1 ? 'true' : 'false');
+          toggle.innerHTML = '<span aria-hidden="true">⌄</span>';
+          const name = document.createElement('span');
+          name.textContent = childDirectory.name;
+          toggle.append(name);
+
+          const children = document.createElement('div');
+          children.className = 'code-project-reader__directory-children';
+          children.hidden = depth >= 1;
+          children.append(renderDirectory(childDirectory, depth + 1));
+
+          toggle.addEventListener('click', () => {
+            const expanded = toggle.getAttribute('aria-expanded') === 'true';
+            toggle.setAttribute('aria-expanded', String(!expanded));
+            children.hidden = expanded;
+          });
+
+          row.append(toggle, children);
+          fragment.append(row);
+        });
+
+        files.forEach((file) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'code-project-reader__file';
+          button.style.setProperty('--tree-depth', String(depth));
+          button.title = `${file.path} (${formatBytes(file.size)})`;
+          button.innerHTML = `<span aria-hidden="true">${file.previewable ? '◇' : '◈'}</span>`;
+          const name = document.createElement('span');
+          name.textContent = file.name;
+          button.append(name);
+          button.addEventListener('click', () => void openFile(file).catch(showError));
+          fileButtons.set(file.path, button);
+          fragment.append(button);
+        });
+
+        return fragment;
+      };
+
+      const showError = (error: unknown) => {
+        const message = error instanceof Error ? error.message : '读取代码文件失败';
+        status.textContent = message;
+        editor.setValue(`代码阅读器错误：${message}`);
+        monaco.editor.setModelLanguage(editor.getModel()!, 'plaintext');
+      };
+
+      treeContainer.replaceChildren(renderDirectory(buildTree(manifest.files)));
+
+      const normalizedEntry = requestedEntry.toLowerCase();
+      const initialFile = manifest.files.find((file) => file.path.toLowerCase() === normalizedEntry)
+        ?? manifest.files.find((file) => normalizedEntry && file.path.toLowerCase().endsWith(`/${normalizedEntry}`))
+        ?? manifest.files.find((file) => file.previewable)
+        ?? manifest.files[0];
+      await openFile(initialFile);
+
+      copyButton.addEventListener('click', async () => {
+        if (!currentFile?.previewable) return;
+        try {
+          await navigator.clipboard.writeText(editor.getValue());
+          const originalText = copyButton.textContent;
+          copyButton.textContent = '已复制';
+          window.setTimeout(() => { copyButton.textContent = originalText; }, 1_200);
+        } catch {
+          status.textContent = '浏览器未授予剪贴板权限，请在编辑器中手动选择复制';
+        }
+      });
+
+      wrapButton.addEventListener('click', () => {
+        const nextWrap = wrapButton.getAttribute('aria-pressed') !== 'true';
+        wrapButton.setAttribute('aria-pressed', String(nextWrap));
+        editor.updateOptions({ wordWrap: nextWrap ? 'on' : 'off' });
+      });
+
+      explorerToggle?.addEventListener('click', () => {
+        const isOpen = root.classList.toggle('is-explorer-open');
+        explorerToggle.setAttribute('aria-expanded', String(isOpen));
+      });
+
+      const themeObserver = new MutationObserver(() => monaco.editor.setTheme(getTheme()));
+      themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      window.addEventListener('pagehide', () => {
+        themeObserver.disconnect();
+        editor.dispose();
+      }, { once: true });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '代码阅读器加载失败';
+      treeContainer.innerHTML = '';
+      const errorMessage = document.createElement('p');
+      errorMessage.className = 'code-project-reader__error';
+      errorMessage.textContent = message;
+      treeContainer.append(errorMessage);
+      currentPath.textContent = '加载失败';
+      status.textContent = `${message}。请确认 ZIP 已上传并重新部署。`;
+    }
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-code-project]').forEach((root) => {
+    void initializeReader(root);
+  });
+</script>
+
+<style is:global>
+  .code-project-reader {
+    width: min(1080px, calc(100vw - 48px));
+    margin: 42px 50% 0;
+    overflow: hidden;
+    border: 1px solid rgba(100, 116, 139, 0.35);
+    border-radius: 16px;
+    background: #181818;
+    color: #d4d4d4;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+    transform: translateX(-50%);
+  }
+
+  .code-project-reader button {
+    font: inherit;
+  }
+
+  .code-project-reader__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 68px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #2b2b2b;
+    background: #202020;
+  }
+
+  .code-project-reader__heading {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 12px;
+  }
+
+  .code-project-reader__heading h2 {
+    overflow: hidden;
+    color: #f3f4f6;
+    font-size: 1rem;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .code-project-reader__eyebrow {
+    margin: 0;
+    color: #858585;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+  }
+
+  .code-project-reader__mark {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+    border-radius: 9px;
+    background: #2563eb;
+    color: #fff;
+    font: 700 0.75rem/1 Consolas, monospace;
+  }
+
+  .code-project-reader__readonly {
+    padding: 3px 9px;
+    border: 1px solid #3d3d3d;
+    border-radius: 999px;
+    color: #a3a3a3;
+    font-size: 0.72rem;
+  }
+
+  .code-project-reader__workspace {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr);
+    min-height: 610px;
+  }
+
+  .code-project-reader__explorer {
+    min-width: 0;
+    overflow: auto;
+    border-right: 1px solid #2b2b2b;
+    background: #181818;
+  }
+
+  .code-project-reader__explorer-title {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 10px 14px 7px;
+    background: #181818;
+    color: #bbb;
+    font-size: 0.69rem;
+    letter-spacing: 0.08em;
+  }
+
+  .code-project-reader__tree {
+    padding: 2px 0 14px;
+    font: 0.8rem/1.4 "Segoe UI", "Microsoft YaHei", sans-serif;
+  }
+
+  .code-project-reader__directory,
+  .code-project-reader__file {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    min-height: 26px;
+    padding: 3px 10px 3px calc(10px + var(--tree-depth, 0) * 14px);
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    color: #cccccc;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .code-project-reader__directory:hover,
+  .code-project-reader__file:hover,
+  .code-project-reader__file.is-active {
+    background: #2a2d2e;
+    color: #fff;
+  }
+
+  .code-project-reader__directory > span:first-child {
+    width: 12px;
+    flex: 0 0 auto;
+    transition: transform 0.15s ease;
+  }
+
+  .code-project-reader__directory[aria-expanded="false"] > span:first-child {
+    transform: rotate(-90deg);
+  }
+
+  .code-project-reader__directory > span:last-child,
+  .code-project-reader__file > span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .code-project-reader__file > span:first-child {
+    color: #60a5fa;
+  }
+
+  .code-project-reader__main {
+    display: grid;
+    grid-template-rows: 38px minmax(0, 1fr) 24px;
+    min-width: 0;
+    background: #1e1e1e;
+  }
+
+  .code-project-reader__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+    border-bottom: 1px solid #2b2b2b;
+    background: #181818;
+  }
+
+  .code-project-reader__path {
+    min-width: 0;
+    padding: 0 14px;
+    overflow: hidden;
+    color: #d4d4d4;
+    font-size: 0.78rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .code-project-reader__actions {
+    display: flex;
+    height: 100%;
+    flex: 0 0 auto;
+  }
+
+  .code-project-reader__actions button,
+  .code-project-reader__explorer-toggle {
+    padding: 0 11px;
+    border: 0;
+    border-left: 1px solid #2b2b2b;
+    background: transparent;
+    color: #b8b8b8;
+    font-size: 0.74rem;
+    cursor: pointer;
+  }
+
+  .code-project-reader__actions button:hover,
+  .code-project-reader__actions button[aria-pressed="true"],
+  .code-project-reader__explorer-toggle:hover {
+    background: #2a2d2e;
+    color: #fff;
+  }
+
+  .code-project-reader__actions button:disabled {
+    color: #666;
+    cursor: not-allowed;
+  }
+
+  .code-project-reader__editor {
+    min-width: 0;
+    min-height: 548px;
+  }
+
+  .code-project-reader__status {
+    padding: 3px 10px;
+    overflow: hidden;
+    background: #007acc;
+    color: #fff;
+    font-size: 0.69rem;
+    line-height: 18px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .code-project-reader__loading,
+  .code-project-reader__error {
+    padding: 12px 14px;
+    color: #999;
+    font-size: 0.78rem;
+  }
+
+  .code-project-reader__error {
+    color: #fca5a5;
+  }
+
+  .code-project-reader__explorer-toggle {
+    display: none;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    flex: 0 0 auto;
+    border: 1px solid #3d3d3d;
+    border-radius: 7px;
+  }
+
+  @media (max-width: 760px) {
+    .code-project-reader {
+      width: calc(100vw - 24px);
+      margin-top: 32px;
+    }
+
+    .code-project-reader__workspace {
+      position: relative;
+      display: block;
+      min-height: 540px;
+    }
+
+    .code-project-reader__main {
+      min-height: 540px;
+      grid-template-rows: 38px minmax(0, 1fr) 24px;
+    }
+
+    .code-project-reader__explorer {
+      position: absolute;
+      inset: 0 auto 0 0;
+      z-index: 4;
+      width: min(82vw, 300px);
+      border-right-color: #404040;
+      box-shadow: 18px 0 42px rgba(0, 0, 0, 0.38);
+      transform: translateX(-105%);
+      transition: transform 0.2s ease;
+    }
+
+    .code-project-reader.is-explorer-open .code-project-reader__explorer {
+      transform: translateX(0);
+    }
+
+    .code-project-reader__explorer-toggle {
+      display: block;
+    }
+
+    .code-project-reader__mark {
+      display: none;
+    }
+
+    .code-project-reader__editor {
+      min-height: 478px;
+    }
+
+    .code-project-reader__actions button:first-child {
+      display: none;
+    }
+  }
+</style>

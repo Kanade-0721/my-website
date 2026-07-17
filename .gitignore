@@ -1,5 +1,7 @@
 # build output
 dist/
+public/code-projects/
+.tmp-code-project-test-*/
 
 # generated types
 .astro/
