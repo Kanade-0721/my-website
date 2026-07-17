@@ -1497,15 +1497,12 @@ a.project-item:hover {
   text-decoration: none;
 }
 
-.detail-content mjx-container {
+.detail-content .katex-display {
+  margin: 22px 0;
   overflow-x: auto;
   overflow-y: hidden;
   max-width: 100%;
   padding: 4px 0;
-}
-
-.detail-content mjx-container[display='true'] {
-  margin: 22px 0;
 }
 
 .detail-content img {

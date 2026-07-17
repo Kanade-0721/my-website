@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import "katex/dist/katex.min.css";
 
 const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.props;
 ---
@@ -11,20 +12,6 @@ const { title, description = 'Kanade的小窝', hideChrome = false } = Astro.pro
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" sizes="any" />
-    <script is:inline>
-      window.MathJax = {
-        tex: {
-          inlineMath: [['$', '$'], ['\\(', '\\)']],
-          displayMath: [['$$', '$$'], ['\\[', '\\]']],
-          processEscapes: true,
-        },
-        options: {
-          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-        },
-      };
-    </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-
     <title>{title}</title>
   </head>
 
