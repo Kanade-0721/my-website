@@ -6,7 +6,7 @@ import remarkBreaks from 'remark-breaks';
 import remarkCjkFriendly from 'remark-cjk-friendly/parseOnly';
 import remarkCjkFriendlyGfmStrikethrough from 'remark-cjk-friendly-gfm-strikethrough/parseOnly';
 import remarkFlexibleMarkers from 'remark-flexible-markers';
-import remarkMath from 'remark-math';
+import remarkMath from 'remark-math-extended';
 
 // https://astro.build/config
 export default defineConfig({
