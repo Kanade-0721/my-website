@@ -6,7 +6,14 @@ technologies:
   - Astro
   - TypeScript
   - Markdown
+  - Unified
+  - Remark
+  - Rehype
+  - KaTeX
   - Decap CMS
+  - Monaco Editor
+  - fflate
+  - Zod
   - GitHub OAuth
   - Cloudflare Pages
   - CSS
@@ -26,3 +33,5 @@ published: true
 
 这个项目记录个人网站从基础页面、内容系统、CMS 后台、部署迁移到体验优化的完整搭建过程。
 项目重点不是只做一个展示页，而是建立一个以后可以持续写博客、笔记和项目记录的个人内容系统。
+
+目前内容系统已扩展到 Typora 兼容的 Markdown 与数学公式渲染，并支持在博客、学习笔记和项目帖子中上传 ZIP 代码包，以只读文件树和 Monaco Editor 展示完整代码工程。
