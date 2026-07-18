@@ -4,7 +4,7 @@
 
 网站内容通过 Git-based CMS 管理：后台编辑内容后，会把文章保存为仓库中的 Markdown 文件，再由 Cloudflare Pages 构建并发布。
 
-欢迎访问[kaande的个人网站](https://kanade0721.cn)
+欢迎访问[kanade的个人网站](https://kanade0721.cn)
 
 ## 技术栈
 
