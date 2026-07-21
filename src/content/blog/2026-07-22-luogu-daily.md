@@ -1,6 +1,6 @@
 ---
-title: "2026-07-22 洛谷刷题记录"
-description: "记录 2026-07-22 在洛谷完成的刷题内容、解题思路与复盘。"
+title: 2026-07-22 洛谷刷题记录
+description: 记录 2026-07-22 在洛谷完成的刷题内容、解题思路与复盘。
 date: 2026-07-22 00:39
 published: true
 tags:
@@ -11,6 +11,8 @@ media:
   images: []
   videos: []
   audios: []
+codeProject:
+  enabled: false
 ---
 
 ## 今日概览
@@ -63,6 +65,7 @@ NOIP 2006 普及组 第二题
 ### 代码
 
 ```python
+n,m = map(int,input().split())
 v = []
 w = []
 s = []
