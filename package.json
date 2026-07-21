@@ -9,6 +9,7 @@
     "dev": "astro dev",
     "build": "node scripts/normalize-content-paths.mjs && node scripts/prepare-code-projects.mjs && astro build",
     "test:code-projects": "node scripts/test-code-projects.mjs",
+    "test:luogu-code": "node scripts/test-luogu-code.mjs",
     "luogu:add": "node scripts/luogu-daily.mjs",
     "sync": "node scripts/sync.mjs",
     "oj:push": "node scripts/git-new-oj.mjs",

@@ -2,6 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
+import { stripLeadingCommentLine } from './lib/luogu-code.mjs';
 
 const BLOG_DIR = resolve('src/content/blog');
 const TABLE_START = '<!-- LUOGU_DAILY_TABLE_START -->';
@@ -80,7 +81,8 @@ async function collectItem(values, reader) {
   const idea = values.idea ?? (isInteractive ? await ask(reader, '解题思路，可留空：', existingItem?.idea ?? '') : existingItem?.idea ?? '');
   const review = values.review ?? (isInteractive ? await ask(reader, '复盘/易错点，可留空：') : existingItem?.review ?? '');
   const codeFile = values.codeFile ?? (isInteractive ? await ask(reader, '代码文件路径，可留空：') : '');
-  const code = values.code ?? readCodeFile(codeFile) ?? existingItem?.code ?? '';
+  const suppliedCode = values.code !== undefined ? values.code : readCodeFile(codeFile);
+  const code = suppliedCode === null ? existingItem?.code ?? '' : stripLeadingCommentLine(suppliedCode);
 
   return {
     problemId,
@@ -451,10 +453,7 @@ function readTextFile(filePath) {
 }
 
 function readCodeFile(filePath) {
-  const code = readTextFile(filePath);
-  if (code === null) return null;
-
-  return code.replace(/^\uFEFF?([^\r\n]*)(\r?\n|$)/, '');
+  return readTextFile(filePath);
 }
 
 function stripWrappingQuotes(value) {
