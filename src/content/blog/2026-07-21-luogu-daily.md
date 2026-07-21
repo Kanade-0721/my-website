@@ -1,6 +1,6 @@
 ---
-title: "2026-07-21 洛谷刷题记录"
-description: "记录 2026-07-21 在洛谷完成的刷题内容、解题思路与复盘。"
+title: 2026-07-21 洛谷刷题记录
+description: 记录 2026-07-21 在洛谷完成的刷题内容、解题思路与复盘。
 date: 2026-07-21 23:57
 published: true
 tags:
@@ -11,6 +11,8 @@ media:
   images: []
   videos: []
   audios: []
+codeProject:
+  enabled: false
 ---
 
 ## 今日概览
@@ -63,6 +65,7 @@ $1\le n\le 200$，保证计算过程中任何时刻数值都不超过 $10^6$。
 ### 代码
 
 ```python
+n = int(input())
 graph = [[0]*(n+1) for _ in range(n+1)]
 for i in range(1,n):
      nlist = list(map(int,input().split()))
